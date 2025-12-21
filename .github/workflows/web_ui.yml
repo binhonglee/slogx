@@ -1,0 +1,50 @@
+name: webpage_ui
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Cache node_modules
+        id: cache-node-modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ hashFiles('**/package.json') }}-npm-v1
+      
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "25.0.0"
+
+      - name: Install npm
+        run: npm i
+
+      - name: Run Build
+        run: npm run build
+
+      - name: Test
+        run: npm run test:coverage
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Run E2E tests
+        run: npm run test:e2e
+
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: playwright-report-${{ matrix.node-version }}
+          path: playwright-report/
+          retention-days: 30
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: binhonglee/slogx

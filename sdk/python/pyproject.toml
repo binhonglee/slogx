@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "slogx"
+version = "0.0.1"
+description = "Real-time log streaming SDK for Python"
+readme = "../../README.md"
+license = {text = "MIT"}
+requires-python = ">=3.8"
+dependencies = ["websockets>=10.0"]
+keywords = ["logging", "websocket", "debug", "realtime"]
+
+[project.urls]
+Homepage = "https://github.com/binhonglee/slogx"

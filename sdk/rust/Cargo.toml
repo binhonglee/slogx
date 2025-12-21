@@ -1,0 +1,25 @@
+[package]
+name = "slogx"
+version = "0.1.0"
+edition = "2021"
+description = "Real-time log streaming SDK for Rust"
+license = "MIT"
+keywords = ["logging", "websocket", "debug", "realtime"]
+categories = ["development-tools::debugging"]
+
+[dependencies]
+tokio = { version = "1", features = ["rt-multi-thread", "sync", "net", "macros"] }
+tokio-tungstenite = "0.21"
+futures-util = "0.3"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1", features = ["v4"] }
+backtrace = "0.3"
+
+[dev-dependencies]
+tokio-test = "0.4"
+
+[[example]]
+name = "server"
+path = "examples/server.rs"
