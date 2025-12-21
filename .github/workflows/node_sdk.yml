@@ -1,0 +1,39 @@
+name: node_sdk
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./sdk/ts
+
+    steps:
+      - uses: actions/checkout@v6
+      - name: Cache node_modules
+        id: cache-node-modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ hashFiles('**/package.json') }}-npm-v1
+
+      - name: Use Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "25.0.0"
+
+      - name: Install npm
+        run: npm i
+
+      - name: Run unit tests
+        run: npm run test
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Build application
+        run: npm run build

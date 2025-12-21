@@ -1,0 +1,32 @@
+{
+  "name": "slogx",
+  "version": "0.0.1",
+  "description": "Real-time log streaming SDK for Node.js",
+  "main": "dist/slogx.js",
+  "types": "dist/slogx.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
+    "server": "tsx server.ts",
+    "test": "vitest run --config vitest.config.ts"
+  },
+  "keywords": [
+    "logging",
+    "websocket",
+    "debug",
+    "realtime"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "ws": "8.18.1"
+  },
+  "devDependencies": {
+    "@types/ws": "8.18.1",
+    "tsx": "4.21.0",
+    "typescript": "5.9.3",
+    "vitest": "4.0.16"
+  }
+}

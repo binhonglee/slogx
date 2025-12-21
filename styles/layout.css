@@ -1,0 +1,343 @@
+/* App layout */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Header */
+.header {
+  height: 56px;
+  border-bottom: 1px solid var(--slate-800);
+  background: var(--slate-950);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  flex-shrink: 0;
+  z-index: 20;
+  gap: 16px;
+  overflow-x: auto;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.logo-icon {
+  background: rgba(16, 185, 129, 0.1);
+  padding: 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.logo-icon span {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-family: monospace;
+  color: var(--emerald-500);
+}
+
+.logo h1 {
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: -0.02em;
+}
+
+.header-center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.header-divider {
+  height: 16px;
+  width: 1px;
+  background: var(--slate-800);
+}
+
+/* Filter bar */
+.filter-bar {
+  height: 48px;
+  border-bottom: 1px solid var(--slate-800);
+  background: var(--slate-900);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 16px;
+  flex-shrink: 0;
+  z-index: 10;
+  overflow-x: auto;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  background: var(--slate-950);
+  border: 1px solid var(--slate-700);
+  border-radius: 6px;
+  padding: 6px 12px;
+  width: 256px;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+
+.search-box:focus-within {
+  border-color: var(--blue-500);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.search-box > svg {
+  color: var(--slate-500);
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.search-box input {
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  width: 100%;
+  color: var(--slate-200);
+  font-family: monospace;
+}
+
+.search-box input::placeholder {
+  color: var(--slate-600);
+}
+
+.search-clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--slate-500);
+  cursor: pointer;
+  padding: 2px;
+  margin-left: 4px;
+  border-radius: 4px;
+  transition: all 0.15s;
+}
+
+.search-clear:hover {
+  color: var(--slate-200);
+  background: var(--slate-700);
+}
+
+.filter-divider {
+  height: 24px;
+  width: 1px;
+  background: var(--slate-800);
+  flex-shrink: 0;
+}
+
+.level-filters {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.filter-spacer {
+  flex: 1;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Main content area */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  position: relative;
+}
+
+.log-list-container {
+  position: relative;
+  width: 100%;
+  min-height: 0;
+  transition: height 75ms ease-out;
+}
+
+.log-list {
+  height: 100%;
+  overflow-y: auto;
+}
+
+/* Resize divider */
+.resize-divider {
+  height: 6px;
+  background: var(--slate-950);
+  border-top: 1px solid var(--slate-800);
+  border-bottom: 1px solid var(--slate-800);
+  cursor: row-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  transition: background 0.15s;
+}
+
+.resize-divider:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.5);
+}
+
+.resize-divider span {
+  width: 48px;
+  height: 2px;
+  background: var(--slate-600);
+  border-radius: 2px;
+  transition: background 0.15s;
+}
+
+.resize-divider:hover span {
+  background: var(--blue-400);
+}
+
+/* Details panel container */
+.details-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  z-index: 10;
+  position: relative;
+  background: var(--slate-900);
+}
+
+/* Empty state */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--slate-600);
+}
+
+.empty-state-card {
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(30, 41, 59, 0.5);
+  border-radius: 8px;
+  max-width: 384px;
+  text-align: center;
+}
+
+.empty-state-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.empty-state-icon > div {
+  background: var(--slate-900);
+  padding: 12px;
+  border-radius: 50%;
+}
+
+.empty-state-icon svg {
+  color: var(--slate-500);
+}
+
+.empty-state h3 {
+  color: var(--slate-200);
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.empty-state p {
+  font-size: 12px;
+  color: var(--slate-500);
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+.empty-state-quickstart {
+  background: var(--slate-900);
+  padding: 12px;
+  border-radius: 4px;
+  border: 1px solid var(--slate-800);
+  margin-bottom: 12px;
+  text-align: left;
+}
+
+.empty-state-quickstart .label {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--slate-500);
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.empty-state-quickstart code {
+  font-size: 12px;
+  font-family: monospace;
+  color: var(--emerald-400);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.empty-state-quickstart .hint {
+  font-size: 10px;
+  color: var(--slate-600);
+}
+
+/* Scroll to bottom button */
+.scroll-btn {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  background: var(--blue-600);
+  color: white;
+  border: 1px solid rgba(96, 165, 250, 0.5);
+  border-radius: 50%;
+  padding: 8px;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  transition: all 0.15s;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.scroll-btn:hover {
+  background: var(--blue-500);
+  transform: translateX(-50%) scale(1.1);
+}
+
+.scroll-btn:active {
+  transform: translateX(-50%) scale(0.95);
+}
+
+.scroll-btn svg {
+  transition: transform 0.15s;
+}
+
+.scroll-btn:hover svg {
+  transform: translateY(2px);
+}
