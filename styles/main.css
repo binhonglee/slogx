@@ -40,6 +40,11 @@
   --green-400: #4ade80;
   --orange-400: #fb923c;
   --purple-400: #c084fc;
+
+  --rust: #B7410E;
+  --go: #00ADD8;
+  --node: #3C873A;
+  --python: #3776ab;
 }
 
 html, body {

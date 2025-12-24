@@ -418,9 +418,10 @@
   color: var(--emerald-400);
 }
 
-.tab.active.node { border-bottom-color: var(--green-400); color: var(--green-400); }
-.tab.active.python { border-bottom-color: var(--yellow-500); color: var(--yellow-400); }
-.tab.active.go { border-bottom-color: var(--cyan-400); color: var(--cyan-400); }
+.tab.active.node { border-bottom-color: var(--node); color: var(--node); }
+.tab.active.python { border-bottom-color: var(--python); color: var(--python); }
+.tab.active.go { border-bottom-color: var(--go); color: var(--go); }
+.tab.active.rust { border-bottom-color: var(--rust); color: var(--rust); }
 
 .tab img {
   width: 16px;
@@ -502,6 +503,7 @@
   width: 64px;
 }
 
-.info-box .commands .lang.node { color: var(--emerald-400); }
-.info-box .commands .lang.python { color: var(--yellow-400); }
-.info-box .commands .lang.go { color: var(--cyan-400); }
+.info-box .commands .lang.node { color: var(--node); }
+.info-box .commands .lang.python { color: var(--python); }
+.info-box .commands .lang.go { color: var(--go); }
+.info-box .commands .lang.rust { color: var(--rust); }
