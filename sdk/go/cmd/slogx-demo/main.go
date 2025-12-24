@@ -35,6 +35,7 @@ var endpoints = []string{"/api/login", "/api/dashboard", "/api/settings", "/api/
 
 func main() {
 	slogx.Init(slogx.Config{
+		IsDev:       true,
 		Port:        8082,
 		ServiceName: "gateway-service",
 	})

@@ -14,11 +14,15 @@ const SetupModal: FunctionComponent<SetupModalProps> = ({ isOpen, onClose }) => 
   if (!isOpen) return null;
 
   const nodeCode = `
-// Requires: npm install slogx
+// Requires: npm install @binhonglee/slogx
 import { slogx } from 'slogx';
 
-// 1. Start the log server
-slogx.init({ port: 8080, serviceName: 'my-api' });
+// 1. Start the log server (isDev prevents accidental prod use)
+slogx.init({
+  isDev: process.env.NODE_ENV !== 'production',
+  port: 8080,
+  serviceName: 'my-api'
+});
 
 // 2. Log anywhere in your app
 slogx.info("Server started", { env: process.env.NODE_ENV });
@@ -31,13 +35,18 @@ slogx.error("DB Connection Failed", new Error("Timeout"), {
 
   const pythonCode = `
 # Requires: pip install slogx
+import os
 from slogx import slogx
 
-# 1. Start the log server (non-blocking)
-slogx.init(port=8080, service_name='my-service')
+# 1. Start the log server (is_dev prevents accidental prod use)
+slogx.init(
+    is_dev=os.environ.get('ENV') != 'production',
+    port=8080,
+    service_name='my-service'
+)
 
 # 2. Log anywhere
-slogx.info("Server started", {"env": "prod"})
+slogx.info("Server started", {"env": "dev"})
 
 try:
     1 / 0
@@ -47,14 +56,21 @@ except Exception as e:
 
   const goCode = `
 // Requires: go get github.com/binhonglee/slogx
-import "github.com/binhonglee/slogx"
+import (
+    "os"
+    "github.com/binhonglee/slogx"
+)
 
 func main() {
-    // 1. Start log server (runs in goroutine)
-    slogx.Init(8080, "my-service")
+    // 1. Start log server (IsDev prevents accidental prod use)
+    slogx.Init(slogx.Config{
+        IsDev:       os.Getenv("ENV") != "production",
+        Port:        8080,
+        ServiceName: "my-service",
+    })
 
     // 2. Log anywhere
-    slogx.Info("Processing request", "id", 123)
+    slogx.Info("Processing request", map[string]interface{}{"id": 123})
 
     slogx.Error("DB failed", map[string]interface{}{
         "retry": false,
@@ -67,14 +83,15 @@ func main() {
 
 #[tokio::main]
 async fn main() {
-    // 1. Start log server
-    slogx::init(8080, "rust-demo").await;
+    // 1. Start log server (is_dev prevents accidental prod use)
+    let is_dev = std::env::var("ENV").unwrap_or_default() != "production";
+    slogx::init(is_dev, 8080, "rust-demo").await;
 
     // 2. Log anywhere
-    slogx::info!("Processing request", "id", 123);
+    slogx::info!("Processing request", { "id": 123 });
 
     slogx::error!("DB failed", {
-        "retry": false,
+        "retry": false
     });
 }
 `;

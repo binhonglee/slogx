@@ -7,7 +7,7 @@ use tokio::time::sleep;
 
 #[tokio::main]
 async fn main() {
-    slogx::init(8080, "rust-demo").await;
+    slogx::init(true, 8080, "rust-demo").await;
 
     println!("Sending demo logs every 2 seconds...");
     println!("Connect slogx viewer to ws://localhost:8080");

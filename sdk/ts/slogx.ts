@@ -9,6 +9,8 @@ enum LogLevel {
 }
 
 interface SlogConfig {
+  /** Required safety flag - set to true to acknowledge this is not for production use */
+  isDev: boolean;
   port?: number;
   serviceName?: string;
 }
@@ -35,20 +37,33 @@ class SlogX {
   /**
    * Initialize the SlogX server.
    * Starts a WebSocket server on the specified port (default 8080).
+   * Returns a Promise that resolves when the server is ready.
+   *
+   * @param config.isDev - Required. Must be true to enable slogx. Prevents accidental production use.
    */
-  public init(config: SlogConfig = {}) {
+  public init(config: SlogConfig): Promise<void> {
+    if (!config.isDev) {
+      // Silently skip initialization in production
+      return Promise.resolve();
+    }
+
     const port = config.port || 8080;
     this.serviceName = config.serviceName || 'node-service';
 
-    this.wss = new WebSocketServer({ port });
+    return new Promise((resolve) => {
+      this.wss = new WebSocketServer({ port });
 
-    this.wss.on('connection', (ws) => {
-      this.clients.add(ws);
-      ws.on('close', () => this.clients.delete(ws));
-      ws.on('error', () => this.clients.delete(ws));
+      this.wss.on('connection', (ws) => {
+        this.clients.add(ws);
+        ws.on('close', () => this.clients.delete(ws));
+        ws.on('error', () => this.clients.delete(ws));
+      });
+
+      this.wss.on('listening', () => {
+        console.log(`[slogx] 🚀 Log server running at ws://localhost:${port}`);
+        resolve();
+      });
     });
-
-    console.log(`[slogx] 🚀 Log server running at ws://localhost:${port}`);
   }
 
   /**

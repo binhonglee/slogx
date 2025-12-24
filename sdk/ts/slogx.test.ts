@@ -47,12 +47,12 @@ describe('SlogX SDK', () => {
 
   describe('init()', () => {
     it('creates WebSocket server with default port', () => {
-      slogx.init();
+      slogx.init({ isDev: true });
       expect(WebSocketServer).toHaveBeenCalledWith({ port: 8080 });
     });
 
     it('creates WebSocket server with custom port', () => {
-      slogx.init({ port: 9999 });
+      slogx.init({ isDev: true, port: 9999 });
       // Check that init was called (the mock captures all calls)
       const calls = (WebSocketServer as any).mock.calls;
       const customPortCall = calls.find((c: any) => c[0]?.port === 9999);
@@ -60,7 +60,7 @@ describe('SlogX SDK', () => {
     });
 
     it('sets up connection handler', () => {
-      slogx.init();
+      slogx.init({ isDev: true });
       expect(mockWss.on).toHaveBeenCalledWith('connection', expect.any(Function));
     });
   });
@@ -85,7 +85,7 @@ describe('SlogX SDK', () => {
 
   describe('message broadcasting', () => {
     it('sends message to connected clients', async () => {
-      slogx.init();
+      slogx.init({ isDev: true });
 
       // Simulate a client connection
       const mockClient = {
@@ -121,7 +121,7 @@ describe('SlogX SDK', () => {
     });
 
     it('broadcasts correct log level', async () => {
-      slogx.init();
+      slogx.init({ isDev: true });
 
       const mockClient = {
         readyState: 1,
@@ -150,7 +150,7 @@ describe('SlogX SDK', () => {
     });
 
     it('serializes Error objects', async () => {
-      slogx.init();
+      slogx.init({ isDev: true });
 
       const mockClient = {
         readyState: 1,
@@ -177,7 +177,7 @@ describe('SlogX SDK', () => {
     });
 
     it('handles multiple arguments', async () => {
-      slogx.init();
+      slogx.init({ isDev: true });
 
       const mockClient = {
         readyState: 1,
@@ -204,7 +204,7 @@ describe('SlogX SDK', () => {
     });
 
     it('skips closed clients', async () => {
-      slogx.init();
+      slogx.init({ isDev: true });
 
       const openClient = {
         readyState: 1, // OPEN
@@ -236,7 +236,7 @@ describe('SlogX SDK', () => {
 
   describe('log entry structure', () => {
     it('includes all required fields', async () => {
-      slogx.init();
+      slogx.init({ isDev: true });
 
       const mockClient = {
         readyState: 1,
@@ -267,7 +267,7 @@ describe('SlogX SDK', () => {
 
     it('includes service name in metadata', async () => {
       // Re-init with custom service name
-      slogx.init({ serviceName: 'my-custom-service' });
+      slogx.init({ isDev: true, serviceName: 'my-custom-service' });
 
       const mockClient = {
         readyState: 1,
@@ -290,7 +290,7 @@ describe('SlogX SDK', () => {
     });
 
     it('includes caller info in metadata', async () => {
-      slogx.init();
+      slogx.init({ isDev: true });
 
       const mockClient = {
         readyState: 1,
@@ -316,7 +316,7 @@ describe('SlogX SDK', () => {
     });
 
     it('includes stacktrace', async () => {
-      slogx.init();
+      slogx.init({ isDev: true });
 
       const mockClient = {
         readyState: 1,
