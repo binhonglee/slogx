@@ -29,6 +29,8 @@ jobs:
             ~/.cargo/git
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/sdk/rust/Cargo.lock') }}
 
-      - name: Run `cargo test`
-        run: |
-          cargo test --verbose
+      - name: Run test
+        run: cargo test --verbose
+
+      - name: Build release
+        run: cargo build --release --verbose
