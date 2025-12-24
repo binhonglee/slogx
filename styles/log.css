@@ -243,21 +243,23 @@
 }
 
 .metadata-grid .lang-badge.go {
-  background: rgba(8, 51, 68, 0.5);
-  color: var(--cyan-400);
-  border-color: rgba(34, 211, 238, 0.3);
+  color: var(--go);
+  border-color: var(--go);
 }
 
 .metadata-grid .lang-badge.python {
-  background: rgba(66, 32, 6, 0.5);
-  color: var(--yellow-400);
-  border-color: rgba(234, 179, 8, 0.3);
+  color: var(--python);
+  border-color: var(--python);
 }
 
 .metadata-grid .lang-badge.node {
-  background: rgba(2, 44, 34, 0.5);
-  color: var(--emerald-400);
-  border-color: rgba(16, 185, 129, 0.3);
+  color: var(--node);
+  border-color: var(--node);
+}
+
+.metadata-grid .lang-badge.rust {
+  color: var(--rust);
+  border-color: var(--rust);
 }
 
 /* Payload section */
