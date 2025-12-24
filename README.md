@@ -4,6 +4,8 @@
 
 slogx is a tool that streams structured logs from your backend to a web UI over WebSockets. It's designed to make it trivial for developers to debug locally.
 
+https://github.com/user-attachments/assets/616ddfb8-20f5-48fe-be58-0dd64e3a0fa3
+
 **Why use slogx?**
 - Fast setup: install the SDK and call `init()` once. No external agents or complicated config.
 - Structured logs: captures arguments, stack traces, and source metadata (file/line/function/service).
