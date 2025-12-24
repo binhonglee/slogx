@@ -33,6 +33,7 @@ __pycache__/
 .pytest_cache/
 .venv/
 venv/
+slogx.egg-info/
 
 # Go
 sdk/go/slogx-demo
