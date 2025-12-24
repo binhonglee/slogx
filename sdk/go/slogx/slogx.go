@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand"
+	"net"
 	"net/http"
 	"path/filepath"
 	"runtime"
@@ -23,6 +24,8 @@ const (
 )
 
 type Config struct {
+	// IsDev is required. Must be true to enable slogx. Prevents accidental production use.
+	IsDev       bool
 	Port        int
 	ServiceName string
 }
@@ -59,13 +62,13 @@ func getInstance() *SlogX {
 	return instance
 }
 
-func Init(configs ...Config) {
-	s := getInstance()
-
-	var config Config
-	if len(configs) > 0 {
-		config = configs[0]
+func Init(config Config) {
+	if !config.IsDev {
+		// Silently skip initialization in production
+		return
 	}
+
+	s := getInstance()
 
 	if config.ServiceName != "" {
 		s.serviceName = config.ServiceName
@@ -76,7 +79,8 @@ func Init(configs ...Config) {
 		port = 8080
 	}
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		conn, err := s.upgrader.Upgrade(w, r, nil)
 		if err != nil {
 			return
@@ -101,12 +105,17 @@ func Init(configs ...Config) {
 		}()
 	})
 
-	go func() {
-		fmt.Printf("[slogx] 🚀 Log server running at ws://localhost:%d\n", port)
-		http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
-	}()
+	// Create listener first so we know the server is ready
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+	if err != nil {
+		panic(fmt.Sprintf("[slogx] Failed to bind to port %d: %v", port, err))
+	}
 
-	time.Sleep(100 * time.Millisecond)
+	fmt.Printf("[slogx] 🚀 Log server running at ws://localhost:%d\n", port)
+
+	go func() {
+		http.Serve(listener, mux)
+	}()
 }
 
 func generateID() string {

@@ -34,16 +34,20 @@ Note: the `server` script uses the TypeScript demo in `sdk/ts/server.ts` which i
 **Minimal integration (copy-paste)**
 
 Pick your language and add the SDK snippet below. Each SDK provides:
-- `init(port, serviceName)` — starts a WebSocket server on the given port (default 8080)
+- `init(isDev, port, serviceName)` — starts a WebSocket server on the given port (default 8080). The `isDev` flag is required to prevent accidental production use.
 - logging helpers: `debug`, `info`, `warn`, `error` that accept message strings, objects, Error/Exception values, or multiple arguments.
 
 - Node (local/dev):
 
 ```js
-// Requires: npm install slogx
+// Requires: npm install @binhonglee/slogx
 import { slogx } from 'slogx';
 
-slogx.init({ port: 8080, serviceName: 'my-service' });
+slogx.init({
+  isDev: process.env.NODE_ENV !== 'production',
+  port: 8080,
+  serviceName: 'my-service'
+});
 
 slogx.info('Server started', { env: process.env.NODE_ENV });
 slogx.error('Operation failed', new Error('timeout'));
@@ -53,9 +57,14 @@ slogx.error('Operation failed', new Error('timeout'));
 
 ```py
 # Requires: pip install slogx
+import os
 from slogx import slogx
 
-slogx.init(port=8080, service_name='my-service')
+slogx.init(
+    is_dev=os.environ.get('ENV') != 'production',
+    port=8080,
+    service_name='my-service'
+)
 slogx.info('Started', {'env': 'dev'})
 ```
 
@@ -63,10 +72,17 @@ slogx.info('Started', {'env': 'dev'})
 
 ```go
 // Requires: go get github.com/binhonglee/slogx
-import "github.com/binhonglee/slogx"
+import (
+    "os"
+    "github.com/binhonglee/slogx"
+)
 
 func main() {
-    slogx.Init(slogx.Config{Port: 8080, ServiceName: "my-service"})
+    slogx.Init(slogx.Config{
+        IsDev:       os.Getenv("ENV") != "production",
+        Port:        8080,
+        ServiceName: "my-service",
+    })
     slogx.Info("Started", map[string]interface{}{"env": "dev"})
 }
 ```
@@ -77,7 +93,8 @@ func main() {
 // Requires: cargo add slogx
 #[tokio::main]
 async fn main() {
-    slogx::init(8080, "my-service").await;
+    let is_dev = std::env::var("ENV").unwrap_or_default() != "production";
+    slogx::init(is_dev, 8080, "my-service").await;
     slogx::info!("Started", { "env": "dev" });
 }
 ```

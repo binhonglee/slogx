@@ -1,5 +1,5 @@
 {
-  "name": "slogx",
+  "name": "@binhonglee/slogx",
   "version": "0.0.1",
   "description": "Real-time log streaming SDK for Node.js",
   "main": "dist/slogx.js",
@@ -28,5 +28,8 @@
     "tsx": "4.21.0",
     "typescript": "5.9.3",
     "vitest": "4.0.16"
+  },
+  "repository": {
+    "url": "https://github.com/binhonglee/slogx"
   }
 }

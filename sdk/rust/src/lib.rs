@@ -7,7 +7,8 @@
 //! ```no_run
 //! #[tokio::main]
 //! async fn main() {
-//!     slogx::init(8080, "my-service").await;
+//!     let is_dev = std::env::var("ENV").unwrap_or_default() != "production";
+//!     slogx::init(is_dev, 8080, "my-service").await;
 //!
 //!     slogx::info!("Server started", {"port": 8080});
 //! }
@@ -297,11 +298,20 @@ fn get_instance() -> &'static SlogX {
 
 /// Initialize the global SlogX server.
 ///
+/// # Arguments
+/// * `is_dev` - Required. Must be true to enable slogx. Prevents accidental production use.
+/// * `port` - WebSocket server port
+/// * `service_name` - Service name for log metadata
+///
 /// # Example
 /// ```ignore
-/// slogx::init(8080, "my-service").await;
+/// let is_dev = std::env::var("ENV").unwrap_or_default() != "production";
+/// slogx::init(is_dev, 8080, "my-service").await;
 /// ```
-pub async fn init(port: u16, service_name: &str) {
+pub async fn init(is_dev: bool, port: u16, service_name: &str) {
+    if !is_dev {
+        return;
+    }
     get_instance().start(port, service_name).await;
 }
 

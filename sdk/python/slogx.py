@@ -26,10 +26,22 @@ class SlogX:
         self._server = None
         self._loop: Optional[asyncio.AbstractEventLoop] = None
 
-    def init(self, port: int = 8080, service_name: str = 'python-service'):
-        """Initialize the SlogX server. Starts a WebSocket server on the specified port."""
+    def init(self, is_dev: bool, port: int = 8080, service_name: str = 'python-service'):
+        """Initialize the SlogX server. Starts a WebSocket server on the specified port.
+
+        Args:
+            is_dev: Required. Must be True to enable slogx. Prevents accidental production use.
+            port: WebSocket server port (default 8080)
+            service_name: Service name for log metadata
+
+        Blocks until the server is ready to accept connections.
+        """
+        if not is_dev:
+            return
+
         self._service_name = service_name
         self._loop = asyncio.new_event_loop()
+        ready_event = threading.Event()
 
         async def handler(websocket: WebSocketServerProtocol):
             self._clients.add(websocket)
@@ -41,6 +53,7 @@ class SlogX:
         async def start_server():
             self._server = await serve(handler, "localhost", port)
             print(f"[slogx] 🚀 Log server running at ws://localhost:{port}")
+            ready_event.set()
             await self._server.wait_closed()
 
         def run_loop():
@@ -49,7 +62,7 @@ class SlogX:
 
         thread = threading.Thread(target=run_loop, daemon=True)
         thread.start()
-        time.sleep(0.1)
+        ready_event.wait()  # Block until server is ready
 
     def _generate_id(self) -> str:
         return ''.join(random.choices(string.ascii_lowercase + string.digits, k=13))
