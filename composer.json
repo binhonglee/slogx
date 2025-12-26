@@ -14,15 +14,15 @@
   },
   "autoload": {
     "psr-4": {
-      "Slogx\\": "src/"
+      "Slogx\\": "sdk/php/src/"
     },
     "files": [
-      "src/functions.php"
+      "sdk/php/src/functions.php"
     ]
   },
   "autoload-dev": {
     "psr-4": {
-      "Slogx\\Tests\\": "tests/"
+      "Slogx\\Tests\\": "sdk/php/tests/"
     }
   }
 }
