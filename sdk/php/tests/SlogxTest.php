@@ -45,8 +45,8 @@ class SlogxTest extends TestCase
 
     public function testInitWithoutIsDev(): void
     {
-        // Should not throw when isDev is false
-        $this->slogx->init(['isDev' => false]);
+        // Should not throw when isDev is false (using static API)
+        Slogx::init(['isDev' => false]);
         $this->assertTrue(true); // If we get here, no exception was thrown
     }
 
@@ -55,6 +55,22 @@ class SlogxTest extends TestCase
         // This test would actually start a server, so we'll skip it
         // In a real test environment, you'd mock the server components
         $this->markTestSkipped('Requires mocking WebSocket server');
+    }
+
+    public function testStaticApiExists(): void
+    {
+        // Test that static methods are available
+        $this->assertTrue(method_exists(Slogx::class, 'init'));
+        $this->assertTrue(method_exists(Slogx::class, 'debug'));
+        $this->assertTrue(method_exists(Slogx::class, 'info'));
+        $this->assertTrue(method_exists(Slogx::class, 'warn'));
+        $this->assertTrue(method_exists(Slogx::class, 'error'));
+    }
+
+    public function testLowercaseAliasExists(): void
+    {
+        // Test that lowercase alias is available
+        $this->assertTrue(class_exists('Slogx\\slogx'));
     }
 
     // ID Generation Tests
