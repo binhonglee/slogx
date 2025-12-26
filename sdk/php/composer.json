@@ -1,7 +1,6 @@
 {
   "name": "binhonglee/slogx",
   "description": "Real-time log streaming SDK for PHP",
-  "version": "0.0.1",
   "type": "library",
   "keywords": ["logging", "websocket", "debug", "realtime"],
   "license": "MIT",
