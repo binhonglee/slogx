@@ -8,7 +8,7 @@ interface SetupModalProps {
 }
 
 const SetupModal: FunctionComponent<SetupModalProps> = ({ isOpen, onClose }) => {
-  const [activeTab, setActiveTab] = useState<'node' | 'python' | 'go' | 'rust'>('node');
+  const [activeTab, setActiveTab] = useState<'node' | 'python' | 'go' | 'rust' | 'php'>('node');
   const [copied, setCopied] = useState(false);
 
   if (!isOpen) return null;
@@ -96,12 +96,35 @@ async fn main() {
 }
 `;
 
+  const phpCode = `
+// Requires: composer require binhonglee/slogx
+<?php
+use Slogx\\slogx;
+
+// 1. Start log server (isDev prevents accidental prod use)
+slogx::init([
+    'isDev' => $_ENV['APP_ENV'] !== 'production',
+    'port' => 8080,
+    'serviceName' => 'my-service'
+]);
+
+// 2. Log anywhere
+slogx::info('Processing request', ['id' => 123]);
+
+try {
+    // your code
+} catch (\\Exception $e) {
+    slogx::error('Operation failed', $e);
+}
+`;
+
   const getCode = () => {
     switch (activeTab) {
       case 'node': return nodeCode.trim();
       case 'python': return pythonCode.trim();
       case 'go': return goCode.trim();
       case 'rust': return rustCode.trim();
+      case 'php': return phpCode.trim();
       default: return '';
     }
   };
@@ -143,6 +166,12 @@ async fn main() {
               className={`tab ${activeTab === 'node' ? 'active node' : ''}`}
             >
               Node
+            </button>
+            <button
+              onClick={() => setActiveTab('php')}
+              className={`tab ${activeTab === 'php' ? 'active php' : ''}`}
+            >
+              PHP
             </button>
             <button
               onClick={() => setActiveTab('python')}
