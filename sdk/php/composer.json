@@ -8,8 +8,7 @@
   "homepage": "https://github.com/binhonglee/slogx",
   "require": {
     "php": ">=8.0",
-    "ratchet/ratchet": "^0.4",
-    "ratchet/pawl": "^0.4"
+    "cboden/ratchet": "^0.4"
   },
   "require-dev": {
     "phpunit/phpunit": "^10.0"

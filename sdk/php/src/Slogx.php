@@ -331,4 +331,6 @@ class Slogx
 }
 
 // Create lowercase alias to match other SDKs (slogx.info() in Python/TypeScript)
-class_alias(Slogx::class, 'Slogx\\slogx');
+if (!class_exists('Slogx\\slogx', false)) {
+    class_alias(Slogx::class, 'Slogx\\slogx');
+}
