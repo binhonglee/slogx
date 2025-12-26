@@ -1,0 +1,30 @@
+{
+  "name": "binhonglee/slogx",
+  "description": "Real-time log streaming SDK for PHP",
+  "version": "0.0.1",
+  "type": "library",
+  "keywords": ["logging", "websocket", "debug", "realtime"],
+  "license": "MIT",
+  "homepage": "https://github.com/binhonglee/slogx",
+  "require": {
+    "php": ">=8.0",
+    "ratchet/ratchet": "^0.4",
+    "ratchet/pawl": "^0.4"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^10.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Slogx\\": "src/"
+    },
+    "files": [
+      "src/functions.php"
+    ]
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Slogx\\Tests\\": "tests/"
+    }
+  }
+}
