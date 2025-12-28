@@ -2,7 +2,7 @@ import time
 import random
 from slogx import slogx
 
-slogx.init(port=8081, service_name='payment-service')
+slogx.init(is_dev=True, port=8081, service_name='payment-service')
 
 print("Simulating backend traffic...")
 
