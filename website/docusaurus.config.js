@@ -49,6 +49,7 @@ const config = {
       items: [
         { to: '/', label: 'Docs', position: 'left' },
         { to: '/sdks', label: 'SDKs', position: 'left' },
+        { to: '/mcp', label: 'MCP', position: 'left' },
         {
           href: 'https://binhonglee.github.io/slogx/app',
           label: 'Live Viewer',
@@ -73,6 +74,7 @@ const config = {
           title: 'Product',
           items: [
             { label: 'Docs', to: '/' },
+            { label: 'MCP Server', to: '/mcp' },
             { label: 'Live Viewer', href: 'https://binhonglee.github.io/slogx/app' },
             { label: 'Replay Viewer', href: 'https://binhonglee.github.io/slogx/replay' },
           ],

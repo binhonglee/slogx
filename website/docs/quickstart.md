@@ -68,6 +68,13 @@ slogx.info('Server started', { port: 8080 });
 3. Open the live viewer: [https://binhonglee.github.io/slogx/app](https://binhonglee.github.io/slogx/app).
 4. Connect to your service endpoint (for example, `localhost:8080`).
 
+### AI debugging via MCP (local development)
+
+1. Build and run the slogx MCP server.
+2. Register it with your MCP client (for example, Claude Code).
+3. Connect to your slogx WebSocket endpoint from the MCP tool.
+4. Search and inspect logs from your assistant.
+
 ### Replay mode (CI and test runs)
 
 1. Set `ciMode: true` (or rely on CI auto-detect).
@@ -79,4 +86,5 @@ slogx.info('Server started', { port: 8080 });
 
 - [Live mode details](./live-mode)
 - [Replay mode details](./replay-ci)
+- [MCP server docs](./mcp)
 - [GitHub Action integration](./integrations/github-action)

@@ -15,6 +15,7 @@ slogx is a structured logging toolkit for backend developers. The same SDK calls
 - [Quickstart](./quickstart)
 - [Live mode](./live-mode)
 - [Replay mode (CI)](./replay-ci)
+- [MCP server](./mcp)
 - [GitHub Action integration](./integrations/github-action)
 - [SDK reference hub](./sdks)
 

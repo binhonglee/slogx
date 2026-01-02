@@ -1,0 +1,10 @@
+{
+  "label": "MCP Server",
+  "position": 8,
+  "link": {
+    "type": "generated-index",
+    "slug": "/mcp",
+    "title": "MCP Server",
+    "description": "Connect AI assistants to live slogx logs via the Model Context Protocol server."
+  }
+}
