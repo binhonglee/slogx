@@ -1,10 +1,14 @@
 import { slogx } from './slogx';
 
 async function main() {
+  // Check for --ci flag in arguments
+  const forceCiMode = process.argv.includes('--ci');
+
   await slogx.init({
     isDev: true,
     port: 8083,
-    serviceName: 'auth-service'
+    serviceName: 'auth-service',
+    ciMode: forceCiMode ? true : undefined // undefined lets auto-detection take over
   });
 
   console.log("Simulating backend traffic...");
