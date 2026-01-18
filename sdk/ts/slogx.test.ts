@@ -10,6 +10,10 @@ vi.mock('ws', () => {
         // Store the handler for later use
         (mockWss as any).connectionHandler = handler;
       }
+      if (event === 'listening') {
+        // Auto-trigger listening event so init() resolves
+        setTimeout(() => handler(), 0);
+      }
     }),
     close: vi.fn(),
   };
@@ -27,6 +31,18 @@ vi.mock('ws', () => {
       OPEN: 1,
       CLOSED: 3,
     },
+  };
+});
+
+// Mock the CIWriter class
+vi.mock('./ciWriter', () => {
+  return {
+    CIWriter: vi.fn().mockImplementation(function () {
+      return {
+        write: vi.fn(),
+        close: vi.fn(),
+      };
+    }),
   };
 });
 
@@ -85,7 +101,7 @@ describe('SlogX SDK', () => {
 
   describe('message broadcasting', () => {
     it('sends message to connected clients', async () => {
-      slogx.init({ isDev: true });
+      await slogx.init({ isDev: true });
 
       // Simulate a client connection
       const mockClient = {
@@ -121,7 +137,7 @@ describe('SlogX SDK', () => {
     });
 
     it('broadcasts correct log level', async () => {
-      slogx.init({ isDev: true });
+      await slogx.init({ isDev: true });
 
       const mockClient = {
         readyState: 1,
@@ -150,7 +166,7 @@ describe('SlogX SDK', () => {
     });
 
     it('serializes Error objects', async () => {
-      slogx.init({ isDev: true });
+      await slogx.init({ isDev: true });
 
       const mockClient = {
         readyState: 1,
@@ -177,7 +193,7 @@ describe('SlogX SDK', () => {
     });
 
     it('handles multiple arguments', async () => {
-      slogx.init({ isDev: true });
+      await slogx.init({ isDev: true });
 
       const mockClient = {
         readyState: 1,
@@ -204,7 +220,7 @@ describe('SlogX SDK', () => {
     });
 
     it('skips closed clients', async () => {
-      slogx.init({ isDev: true });
+      await slogx.init({ isDev: true });
 
       const openClient = {
         readyState: 1, // OPEN
@@ -236,7 +252,7 @@ describe('SlogX SDK', () => {
 
   describe('log entry structure', () => {
     it('includes all required fields', async () => {
-      slogx.init({ isDev: true });
+      await slogx.init({ isDev: true });
 
       const mockClient = {
         readyState: 1,
@@ -267,7 +283,7 @@ describe('SlogX SDK', () => {
 
     it('includes service name in metadata', async () => {
       // Re-init with custom service name
-      slogx.init({ isDev: true, serviceName: 'my-custom-service' });
+      await slogx.init({ isDev: true, serviceName: 'my-custom-service' });
 
       const mockClient = {
         readyState: 1,
@@ -290,7 +306,7 @@ describe('SlogX SDK', () => {
     });
 
     it('includes caller info in metadata', async () => {
-      slogx.init({ isDev: true });
+      await slogx.init({ isDev: true });
 
       const mockClient = {
         readyState: 1,
@@ -316,7 +332,7 @@ describe('SlogX SDK', () => {
     });
 
     it('includes stacktrace', async () => {
-      slogx.init({ isDev: true });
+      await slogx.init({ isDev: true });
 
       const mockClient = {
         readyState: 1,
@@ -336,6 +352,70 @@ describe('SlogX SDK', () => {
 
       const payload = JSON.parse(mockClient.send.mock.calls[0][0]);
       expect(payload).toHaveProperty('stacktrace');
+    });
+  });
+  describe('CI Mode', () => {
+    let CIWriterMock: any;
+
+    beforeEach(async () => {
+      // Re-import to get fresh mocks
+      vi.resetModules();
+      const ciWriterModule = await import('./ciWriter');
+      CIWriterMock = ciWriterModule.CIWriter;
+      const module = await import('./slogx');
+      slogx = module.slogx;
+    });
+
+    it('uses WebSocket mode by default when not in CI', async () => {
+      vi.stubEnv('CI', ''); // Ensure CI is not set
+      await slogx.init({ isDev: true });
+      expect(WebSocketServer).toHaveBeenCalled();
+      expect(CIWriterMock).not.toHaveBeenCalled();
+    });
+
+    it('uses CI mode when ciMode is explicitly true', async () => {
+      await slogx.init({ isDev: true, ciMode: true });
+      expect(WebSocketServer).not.toHaveBeenCalled();
+      expect(CIWriterMock).toHaveBeenCalled();
+    });
+
+    it('uses CI mode when CI env var is set', async () => {
+      vi.stubEnv('CI', 'true');
+      await slogx.init({ isDev: true });
+      expect(WebSocketServer).not.toHaveBeenCalled();
+      expect(CIWriterMock).toHaveBeenCalled();
+    });
+
+    it('respects ciMode: false even if in CI environment', async () => {
+      vi.stubEnv('CI', 'true');
+      await slogx.init({ isDev: true, ciMode: false });
+      expect(WebSocketServer).toHaveBeenCalled();
+      expect(CIWriterMock).not.toHaveBeenCalled();
+    });
+
+    it('passes correct config to CIWriter', async () => {
+      await slogx.init({
+        isDev: true,
+        ciMode: true,
+        logFilePath: './custom.log',
+        maxEntries: 500
+      });
+
+      expect(CIWriterMock).toHaveBeenCalledWith('./custom.log', 500);
+    });
+
+    it('delegates log calls to CIWriter in CI mode', async () => {
+      await slogx.init({ isDev: true, ciMode: true });
+
+      const mockWriterInstance = CIWriterMock.mock.instances[0];
+      const writeSpy = mockWriterInstance.write;
+
+      slogx.info('test log');
+
+      expect(writeSpy).toHaveBeenCalled();
+      const entry = writeSpy.mock.calls[0][0];
+      expect(entry.level).toBe('INFO');
+      expect(entry.args[0]).toBe('test log');
     });
   });
 });
