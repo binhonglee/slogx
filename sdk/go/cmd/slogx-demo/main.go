@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"os"
 	"time"
 
 	"github.com/binhonglee/slogx"
@@ -34,10 +35,20 @@ var users = []*User{
 var endpoints = []string{"/api/login", "/api/dashboard", "/api/settings", "/api/data"}
 
 func main() {
+	// Simple parsing for --ci flag
+	ciMode := false
+	for _, arg := range os.Args {
+		if arg == "--ci" {
+			ciMode = true
+			break
+		}
+	}
+
 	slogx.Init(slogx.Config{
 		IsDev:       true,
 		Port:        8082,
 		ServiceName: "gateway-service",
+		CIMode:      &ciMode,
 	})
 
 	fmt.Println("Simulating backend traffic...")
