@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"net"
 	"net/http"
+	"os"
 	"path/filepath"
 	"runtime"
 	"sync"
@@ -28,6 +29,30 @@ type Config struct {
 	IsDev       bool
 	Port        int
 	ServiceName string
+	// CIMode: undefined/nil (auto), true (force file), false (force ws)
+	CIMode      *bool
+	LogFilePath string
+	MaxEntries  int
+}
+
+// Detect if running in a CI environment
+func isCI() bool {
+	ciEnvVars := []string{
+		"CI",
+		"GITHUB_ACTIONS",
+		"GITLAB_CI",
+		"JENKINS_HOME",
+		"CIRCLECI",
+		"BUILDKITE",
+		"TF_BUILD",
+		"TRAVIS",
+	}
+	for _, env := range ciEnvVars {
+		if os.Getenv(env) != "" {
+			return true
+		}
+	}
+	return false
 }
 
 type LogEntry struct {
@@ -44,6 +69,7 @@ type SlogX struct {
 	clientsMu   sync.RWMutex
 	serviceName string
 	upgrader    websocket.Upgrader
+	ciWriter    *CIWriter
 }
 
 var instance *SlogX
@@ -72,6 +98,25 @@ func Init(config Config) {
 
 	if config.ServiceName != "" {
 		s.serviceName = config.ServiceName
+	}
+
+	// Determine CI Mode
+	useCI := false
+	if config.CIMode != nil {
+		useCI = *config.CIMode
+	} else {
+		useCI = isCI()
+	}
+
+	if useCI {
+		logPath := config.LogFilePath
+		if logPath == "" {
+			logPath = fmt.Sprintf("./slogx_logs/%s.ndjson", s.serviceName)
+		}
+
+		s.ciWriter = NewCIWriter(logPath, config.MaxEntries)
+		fmt.Printf("[slogx] 📝 CI mode: logging to %s\n", logPath)
+		return
 	}
 
 	port := config.Port
@@ -154,11 +199,12 @@ func log(level LogLevel, args ...interface{}) {
 	s := getInstance()
 
 	s.clientsMu.RLock()
-	if len(s.clients) == 0 {
-		s.clientsMu.RUnlock()
+	hasClients := len(s.clients) > 0
+	s.clientsMu.RUnlock()
+
+	if s.ciWriter == nil && !hasClients {
 		return
 	}
-	s.clientsMu.RUnlock()
 
 	file, line, funcName, stack := getCallerInfo()
 
@@ -193,6 +239,13 @@ func log(level LogLevel, args ...interface{}) {
 		},
 	}
 
+	// CI Mode: Write to file
+	if s.ciWriter != nil {
+		s.ciWriter.Write(entry)
+		return
+	}
+
+	// WebSocket Mode: Broadcast
 	payload, err := json.Marshal(entry)
 	if err != nil {
 		return
