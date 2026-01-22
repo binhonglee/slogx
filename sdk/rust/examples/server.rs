@@ -7,7 +7,12 @@ use tokio::time::sleep;
 
 #[tokio::main]
 async fn main() {
-    slogx::init(true, 8080, "rust-demo").await;
+    let args: Vec<String> = std::env::args().collect();
+    let force_ci = args.iter().any(|arg| arg == "--ci");
+
+    let ci_mode = if force_ci { Some(true) } else { None };
+
+    slogx::init_with_config(true, 8080, "rust-demo", ci_mode, None, None).await;
 
     println!("Sending demo logs every 2 seconds...");
     println!("Connect slogx viewer to ws://localhost:8080");

@@ -25,6 +25,10 @@ use tokio::net::{TcpListener, TcpStream};
 use tokio::sync::RwLock;
 use tokio_tungstenite::{accept_async, tungstenite::Message, WebSocketStream};
 use uuid::Uuid;
+use std::env;
+
+mod ci_writer;
+use ci_writer::CIWriter;
 
 /// Global singleton instance.
 static INSTANCE: OnceLock<SlogX> = OnceLock::new();
@@ -155,6 +159,7 @@ struct SlogXState {
     next_client_id: ClientId,
     service_name: String,
     initialized: bool,
+    ci_writer: Option<CIWriter>,
 }
 
 impl SlogXState {
@@ -164,6 +169,7 @@ impl SlogXState {
             next_client_id: 0,
             service_name: "rust-service".to_string(),
             initialized: false,
+            ci_writer: None,
         }
     }
 }
@@ -188,8 +194,26 @@ impl SlogX {
         }
     }
 
-    /// Initialize the WebSocket server on the specified port.
-    pub async fn start(&self, port: u16, service_name: &str) {
+    /// Initialize logging with optional CI mode support.
+    pub async fn start(&self, port: u16, service_name: &str, ci_mode_override: Option<bool>, log_file_path: Option<String>, max_entries: Option<usize>) {
+        let use_ci = match ci_mode_override {
+            Some(v) => v,
+            None => is_ci_env(),
+        };
+
+        if use_ci {
+             let path = log_file_path.unwrap_or_else(|| format!("./slogx_logs/{}.ndjson", service_name));
+             let writer = CIWriter::new(&path, max_entries.unwrap_or(10000));
+             
+             let mut state = self.state.write().await;
+             state.service_name = service_name.to_string();
+             state.initialized = true;
+             state.ci_writer = Some(writer);
+             
+             println!("[slogx] 📝 CI mode: logging to {}", path);
+             return;
+        }
+
         {
             let mut state = self.state.write().await;
             state.service_name = service_name.to_string();
@@ -254,10 +278,19 @@ impl SlogX {
     /// Internal logging function.
     async fn log(&self, level: LogLevel, args: Vec<Value>, file: &str, line: u32, function: &str) {
         let state = self.state.read().await;
-        if !state.initialized || state.clients.is_empty() {
+        // Allow logging if initialized and (has clients OR has ci writer)
+        if !state.initialized || (state.clients.is_empty() && state.ci_writer.is_none()) {
             return;
         }
         let service_name = state.service_name.clone();
+        
+        // Check for CI Writer (cheap clone due to Arc internals)
+        let ci_writer = state.ci_writer.clone();
+        
+        // If we are in WebSocket mode, we need to know if we have clients *before* we drop the read lock?
+        // Actually, we can just check if ci_writer is None.
+        
+        // We drop the read lock here so we can optionally acquire a write lock later for WS broadcasting
         drop(state);
 
         let entry = LogEntry::new(
@@ -269,6 +302,15 @@ impl SlogX {
             Some(function),
         );
 
+        // CI Mode
+        if let Some(writer) = ci_writer {
+             if let Ok(val) = serde_json::to_value(&entry) {
+                 writer.write(&val);
+             }
+             return;
+        }
+
+        // WebSocket Mode - Broadcast
         let payload = match serde_json::to_string(&entry) {
             Ok(p) => p,
             Err(_) => return,
@@ -312,7 +354,24 @@ pub async fn init(is_dev: bool, port: u16, service_name: &str) {
     if !is_dev {
         return;
     }
-    get_instance().start(port, service_name).await;
+    // Default to auto-detect CI
+    get_instance().start(port, service_name, None, None, None).await;
+}
+
+/// Initialize with custom configuration, including CI options.
+pub async fn init_with_config(is_dev: bool, port: u16, service_name: &str, ci_mode: Option<bool>, log_file: Option<String>, max_entries: Option<usize>) {
+     if !is_dev {
+        return;
+    }
+    get_instance().start(port, service_name, ci_mode, log_file, max_entries).await;
+}
+
+fn is_ci_env() -> bool {
+    let ci_vars = [
+        "CI", "GITHUB_ACTIONS", "GITLAB_CI", "JENKINS_HOME", 
+        "CIRCLECI", "BUILDKITE", "TF_BUILD", "TRAVIS"
+    ];
+    ci_vars.iter().any(|var| env::var(var).is_ok())
 }
 
 /// Check if the global server is initialized.
@@ -425,6 +484,11 @@ mod tests {
         SlogX::new()
     }
 
+    async fn start_ws(slogx: &SlogX, port: u16, service_name: &str) {
+        // Force WebSocket mode so CI env vars don't switch to file mode.
+        slogx.start(port, service_name, Some(false), None, None).await;
+    }
+
     // --- LogEntry tests ---
 
     #[test]
@@ -493,21 +557,21 @@ mod tests {
     #[tokio::test]
     async fn test_slogx_init_sets_initialized() {
         let slogx = test_instance();
-        slogx.start(19001, "test-service").await;
+        slogx.start(19001, "test-service", None, None, None).await;
         assert!(slogx.is_initialized().await);
     }
 
     #[tokio::test]
     async fn test_slogx_init_sets_service_name() {
         let slogx = test_instance();
-        slogx.start(19002, "custom-name").await;
+        slogx.start(19002, "custom-name", None, None, None).await;
         assert_eq!(slogx.service_name().await, "custom-name");
     }
 
     #[tokio::test]
     async fn test_slogx_starts_with_no_clients() {
         let slogx = test_instance();
-        slogx.start(19003, "test").await;
+        slogx.start(19003, "test", None, None, None).await;
         assert_eq!(slogx.client_count().await, 0);
     }
 
@@ -516,7 +580,7 @@ mod tests {
         let slogx1 = test_instance();
         let slogx2 = slogx1.clone();
 
-        slogx1.start(19004, "shared-service").await;
+        slogx1.start(19004, "shared-service", None, None, None).await;
 
         // Both should see the initialization
         assert!(slogx2.is_initialized().await);
@@ -535,7 +599,7 @@ mod tests {
     #[tokio::test]
     async fn test_log_with_init_but_no_clients_does_not_panic() {
         let slogx = test_instance();
-        slogx.start(19005, "test").await;
+        slogx.start(19005, "test", None, None, None).await;
         // Should complete without panic
         slogx.log(LogLevel::Info, vec![serde_json::json!("test")], "f", 1, "fn").await;
     }
@@ -545,7 +609,7 @@ mod tests {
     #[tokio::test]
     async fn test_client_connection_increments_count() {
         let slogx = test_instance();
-        slogx.start(19006, "test").await;
+        start_ws(&slogx, 19006, "test").await;
 
         assert_eq!(slogx.client_count().await, 0);
 
@@ -561,7 +625,7 @@ mod tests {
     #[tokio::test]
     async fn test_client_receives_log_message() {
         let slogx = test_instance();
-        slogx.start(19007, "msg-test").await;
+        start_ws(&slogx, 19007, "msg-test").await;
 
         // Connect a client
         let (ws, _) = connect_async("ws://127.0.0.1:19007").await.unwrap();
@@ -596,7 +660,7 @@ mod tests {
     #[tokio::test]
     async fn test_all_log_levels_work() {
         let slogx = test_instance();
-        slogx.start(19008, "levels-test").await;
+        start_ws(&slogx, 19008, "levels-test").await;
 
         let (ws, _) = connect_async("ws://127.0.0.1:19008").await.unwrap();
         let (_, mut read) = ws.split();
@@ -621,7 +685,7 @@ mod tests {
     #[tokio::test]
     async fn test_multiple_clients_receive_same_message() {
         let slogx = test_instance();
-        slogx.start(19009, "multi-client").await;
+        start_ws(&slogx, 19009, "multi-client").await;
 
         // Connect two clients
         let (ws1, _) = connect_async("ws://127.0.0.1:19009").await.unwrap();
@@ -658,7 +722,7 @@ mod tests {
     #[tokio::test]
     async fn test_client_disconnect_decrements_count() {
         let slogx = test_instance();
-        slogx.start(19010, "disconnect-test").await;
+        start_ws(&slogx, 19010, "disconnect-test").await;
 
         let (ws, _) = connect_async("ws://127.0.0.1:19010").await.unwrap();
         tokio::time::sleep(tokio::time::Duration::from_millis(50)).await;
