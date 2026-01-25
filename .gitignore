@@ -40,3 +40,7 @@ sdk/go/slogx-demo
 
 # Rust
 sdk/rust/target/
+
+# PHP
+vendor/
+composer.lock

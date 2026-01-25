@@ -28,6 +28,26 @@ slogx.warn("Warning message")
 slogx.error("Error occurred", {"code": 500})
 ```
 
+## CI Mode
+
+In CI environments, you can write logs to a file instead of starting a WebSocket server.
+CI mode is auto-detected via common CI env vars, or can be forced explicitly.
+
+```python
+import os
+from slogx import slogx
+
+slogx.init(
+    is_dev=True,
+    service_name='my-service',
+    ci_mode=True,
+    log_file_path='./slogx_logs/my-service.ndjson',
+    max_entries=10000
+)
+
+slogx.info("CI log entry", {"ok": True})
+```
+
 ## Features
 
 - WebSocket-based real-time log streaming
