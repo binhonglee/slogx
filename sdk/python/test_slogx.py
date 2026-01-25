@@ -1,10 +1,12 @@
 """Unit tests for the slogx Python SDK."""
 
+import os
 import pytest
 import json
+import tempfile
 from datetime import datetime
 from unittest.mock import MagicMock, patch
-from slogx import SlogX, LogLevel
+from slogx import SlogX, LogLevel, _detect_ci, CI_ENV_VARS
 
 
 class TestLogLevel:
@@ -242,6 +244,67 @@ class TestArgumentProcessing:
         args = [CustomClass()]
         json_str = json.dumps(args, default=str)
         assert 'CustomClass instance' in json_str
+
+
+class TestCIMode:
+    def test_detect_ci_env_var(self, monkeypatch):
+        # Clear all CI env vars first (we might be running in CI)
+        for var in CI_ENV_VARS:
+            monkeypatch.delenv(var, raising=False)
+        assert _detect_ci() is False
+
+        monkeypatch.setenv('CI', 'true')
+        assert _detect_ci() is True
+
+        monkeypatch.delenv('CI', raising=False)
+        assert _detect_ci() is False
+
+    def test_init_ci_mode_forced(self):
+        s = SlogX()
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            log_path = os.path.join(tmp_dir, 'logs', 'test.ndjson')
+            s.init(
+                is_dev=True,
+                service_name='ci-service',
+                ci_mode=True,
+                log_file_path=log_path,
+                max_entries=10
+            )
+
+            assert s._ci_writer is not None
+            assert s._loop is None
+
+            s.info('hello', {'ok': True})
+            s._ci_writer.flush()
+
+            with open(log_path, 'r') as f:
+                lines = [line for line in f if line.strip()]
+
+            assert len(lines) >= 1
+            entry = json.loads(lines[-1])
+            assert entry['metadata']['service'] == 'ci-service'
+            assert entry['metadata']['lang'] == 'python'
+
+        s.close()
+
+    def test_init_ci_mode_auto_detect(self, monkeypatch):
+        s = SlogX()
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            log_path = os.path.join(tmp_dir, 'logs', 'auto.ndjson')
+            monkeypatch.setenv('CI', 'true')
+            s.init(
+                is_dev=True,
+                service_name='auto-ci',
+                ci_mode=None,
+                log_file_path=log_path
+            )
+
+            assert s._ci_writer is not None
+            s.info('auto')
+            s._ci_writer.flush()
+            assert os.path.exists(log_path)
+
+        s.close()
 
 
 if __name__ == '__main__':
