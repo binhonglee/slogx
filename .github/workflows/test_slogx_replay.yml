@@ -36,7 +36,7 @@ jobs:
           head -10 slogx_logs/auth-service.ndjson
 
       - name: Test slogx-replay action
-        uses: ./.github/actions/slogx-replay
+        uses: ./replay
         with:
           log_paths: ./sdk/ts/slogx_logs/auth-service.ndjson
           github_token: ${{ secrets.GITHUB_TOKEN }}

@@ -1,17 +1,37 @@
 #!/usr/bin/env node
 /**
  * Inlines all JS, CSS, and images from Vite build into standalone HTML files.
- * Run after `vite build` to produce self-contained dist/index.html and dist/replay.html
+ * Run after `vite build` to produce self-contained dist/app.html, dist/replay.html, and dist/index.html
  */
 
 import { readFileSync, writeFileSync, readdirSync, unlinkSync, rmdirSync, existsSync } from 'fs';
 import { join } from 'path';
 
-const distDir = join(import.meta.dirname, '..', 'dist');
+const rootDir = join(import.meta.dirname, '..');
+const distDir = join(rootDir, 'dist');
 const assetsDir = join(distDir, 'assets');
 
+// Read source files for landing page
+const landingCss = existsSync(join(rootDir, 'styles', 'landing.css'))
+  ? readFileSync(join(rootDir, 'styles', 'landing.css'), 'utf-8')
+  : '';
+
+// Read source images for landing page
+const sourceImages = {};
+const publicAssetsDir = join(rootDir, 'public', 'assets');
+if (existsSync(publicAssetsDir)) {
+  for (const img of readdirSync(publicAssetsDir).filter(f => f.endsWith('.png') || f.endsWith('.jpg') || f.endsWith('.svg'))) {
+    const imgData = readFileSync(join(publicAssetsDir, img));
+    const ext = img.split('.').pop();
+    const mimeType = ext === 'svg' ? 'image/svg+xml' : `image/${ext}`;
+    sourceImages[img] = `data:${mimeType};base64,${imgData.toString('base64')}`;
+  }
+}
+
 if (!existsSync(assetsDir)) {
-  console.log('No assets directory found, skipping inline step');
+  // No Vite assets, but still process landing page
+  processLandingPage();
+  console.log('No Vite assets directory found, only processed landing page');
   process.exit(0);
 }
 
@@ -85,8 +105,34 @@ function processHtmlFile(htmlFileName) {
   return html;
 }
 
+/**
+ * Process the landing page: inline CSS and images from source
+ */
+function processLandingPage() {
+  const htmlPath = join(distDir, 'index.html');
+  if (!existsSync(htmlPath)) {
+    console.log('Skipping index.html (not found)');
+    return null;
+  }
+
+  let html = readFileSync(htmlPath, 'utf-8');
+
+  // Replace source image references
+  for (const [img, dataUrl] of Object.entries(sourceImages)) {
+    html = html.split(`/assets/${img}`).join(dataUrl);
+  }
+
+  // Inline landing CSS
+  html = html.replace(
+    /<link rel="stylesheet" href="\/styles\/landing\.css" \/>/,
+    `<style>${landingCss}</style>`
+  );
+
+  return html;
+}
+
 // Process HTML files
-const htmlFiles = ['index.html', 'replay.html'];
+const htmlFiles = ['app.html', 'replay.html'];
 const results = [];
 
 for (const htmlFile of htmlFiles) {
@@ -97,6 +143,15 @@ for (const htmlFile of htmlFiles) {
     results.push({ name: htmlFile, size: result.length });
     console.log(`Created: ${outputPath} (${(result.length / 1024).toFixed(1)} KB)`);
   }
+}
+
+// Process landing page
+const landingResult = processLandingPage();
+if (landingResult) {
+  const outputPath = join(distDir, 'index.html');
+  writeFileSync(outputPath, landingResult);
+  results.push({ name: 'index.html', size: landingResult.length });
+  console.log(`Created: ${outputPath} (${(landingResult.length / 1024).toFixed(1)} KB)`);
 }
 
 // Clean up assets directory

@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('App Loading', () => {
   test('loads the application', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/app.html');
 
     // Check header elements
     await expect(page.locator('.logo img')).toBeVisible();
@@ -10,14 +10,14 @@ test.describe('App Loading', () => {
   });
 
   test('shows empty state when no connections', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/app.html');
 
     await expect(page.getByText('No Active Data Sources')).toBeVisible();
     await expect(page.getByText('Connect to a backend service using the input above, or enable Demo to see sample data.')).toBeVisible();
   });
 
   test('has filter bar with level buttons', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/app.html');
 
     await expect(page.getByRole('button', { name: 'DEBUG' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'INFO' })).toBeVisible();
@@ -28,7 +28,7 @@ test.describe('App Loading', () => {
 
 test.describe('Demo Mode', () => {
   test('enables demo mode and shows logs', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/app.html');
 
     // Click demo button
     await page.getByRole('button', { name: 'Demo' }).click();
@@ -38,7 +38,7 @@ test.describe('Demo Mode', () => {
   });
 
   test('demo button shows active state when enabled', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/app.html');
 
     const demoButton = page.getByRole('button', { name: 'Demo' });
     await demoButton.click();
@@ -47,7 +47,7 @@ test.describe('Demo Mode', () => {
   });
 
   test('can disable demo mode', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/app.html');
 
     const demoButton = page.getByRole('button', { name: 'Demo' });
 
@@ -63,7 +63,7 @@ test.describe('Demo Mode', () => {
 
 test.describe('Log Filtering', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/app.html');
     await page.getByRole('button', { name: 'Demo' }).click();
     // Wait for some logs
     await expect(page.locator('.log-item')).toBeVisible({ timeout: 5000 });
@@ -117,7 +117,7 @@ test.describe('Log Filtering', () => {
 
 test.describe('Log Selection', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/app.html');
     await page.getByRole('button', { name: 'Demo' }).click();
     await expect(page.locator('.log-item')).toBeVisible({ timeout: 5000 });
   });
@@ -163,7 +163,7 @@ test.describe('Log Selection', () => {
 
 test.describe('Pause/Resume', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/app.html');
     await page.getByRole('button', { name: 'Demo' }).click();
     await expect(page.locator('.log-item')).toBeVisible({ timeout: 5000 });
   });
@@ -194,7 +194,7 @@ test.describe('Pause/Resume', () => {
 
 test.describe('Clear Logs', () => {
   test('can clear all logs', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/app.html');
     await page.getByRole('button', { name: 'Demo' }).click();
     await expect(page.locator('.log-item')).toBeVisible({ timeout: 5000 });
 
@@ -214,7 +214,7 @@ test.describe('Clear Logs', () => {
 
 test.describe('Setup Modal', () => {
   test('can open setup modal', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/app.html');
 
     // Click settings button
     await page.locator('.header-actions .btn-icon').click();
@@ -224,7 +224,7 @@ test.describe('Setup Modal', () => {
   });
 
   test('setup modal has language tabs', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/app.html');
     await page.locator('.header-actions .btn-icon').click();
 
     await expect(page.getByRole('button', { name: /Node/ })).toBeVisible();
@@ -233,7 +233,7 @@ test.describe('Setup Modal', () => {
   });
 
   test('can close setup modal', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/app.html');
     await page.locator('.header-actions .btn-icon').click();
 
     await expect(page.locator('.modal')).toBeVisible();
@@ -245,7 +245,7 @@ test.describe('Setup Modal', () => {
   });
 
   test('can switch between language tabs', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/app.html');
     await page.locator('.header-actions .btn-icon').click();
 
     await expect(page.locator('.modal')).toBeVisible();
@@ -262,7 +262,7 @@ test.describe('Setup Modal', () => {
 
 test.describe('Connection Manager', () => {
   test('has connection input', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/app.html');
 
     const input = page.locator('.connection-form input');
     await expect(input).toBeVisible();
@@ -270,7 +270,7 @@ test.describe('Connection Manager', () => {
   });
 
   test('shows validation error for invalid URL', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/app.html');
 
     const input = page.locator('.connection-form input');
     await input.fill('invalid url with spaces');
@@ -283,7 +283,7 @@ test.describe('Connection Manager', () => {
   });
 
   test('clears validation error when typing', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/app.html');
 
     const input = page.locator('.connection-form input');
     await input.fill('invalid url with spaces');
