@@ -1,4 +1,5 @@
 import { LogEntry } from '../types';
+import { normalizeLogEntry } from './logValidation';
 
 export const parseNDJSON = async (file: File): Promise<LogEntry[]> => {
     return new Promise((resolve, reject) => {
@@ -20,11 +21,9 @@ export const parseNDJSON = async (file: File): Promise<LogEntry[]> => {
                     if (!line) continue;
 
                     try {
-                        const entry = JSON.parse(line) as LogEntry;
-                        // Basic validation
-                        if (entry && typeof entry === 'object' && 'timestamp' in entry && 'level' in entry) {
-                            // Ensure source is tagged as "file" if not present, or maybe just leave it
-                            // Adding a source helps with filtering if we ever merge multiple files
+                        const parsed = JSON.parse(line);
+                        const entry = normalizeLogEntry(parsed);
+                        if (entry) {
                             entry.source = file.name;
                             entries.push(entry);
                         }

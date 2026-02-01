@@ -22,8 +22,30 @@ jobs:
         with:
           node-version: "25.0.0"
 
+      - name: Use Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Use Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.21"
+
+      - name: Use Rust
+        uses: dtolnay/rust-toolchain@stable
+
       - name: Install npm
-        run: npm i
+        run: npm ci
+
+      - name: Install TypeScript SDK deps
+        run: npm ci
+        working-directory: ./sdk/ts
+
+      - name: Install Python SDK deps (venv)
+        run: |
+          python -m venv .venv
+          .venv/bin/pip install -r sdk/python/requirements.txt
 
       - name: Run Build
         run: npm run build
@@ -35,7 +57,7 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run E2E tests
-        run: npm run test:e2e
+        run: SLOGX_PYTHON="$GITHUB_WORKSPACE/.venv/bin/python" npm run test:e2e
 
       - uses: actions/upload-artifact@v6
         if: always()

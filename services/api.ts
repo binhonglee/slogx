@@ -1,4 +1,5 @@
 import { LogEntry } from '../types';
+import { normalizeLogEntry } from './logValidation';
 
 type LogHandler = (logs: LogEntry[]) => void;
 type StatusHandler = (isConnected: boolean) => void;
@@ -100,7 +101,13 @@ export const connectToLogStream = (
       ws.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
-          const entries: LogEntry[] = Array.isArray(data) ? data : [data];
+          const rawEntries = Array.isArray(data) ? data : [data];
+          const entries = rawEntries
+            .map(normalizeLogEntry)
+            .filter((entry): entry is LogEntry => entry !== null);
+
+          if (entries.length === 0) return;
+
           // Attach source URL to each log entry
           entries.forEach(entry => entry.source = wsUrl);
           onLogs(entries);
