@@ -38,6 +38,6 @@ export default defineConfig({
         '**/*.spec.ts',
       ]
     },
-    include: ['components/*.test.{ts,tsx}', 'hooks/*.test.{ts,tsx}'],
+    include: ['components/*.test.{ts,tsx}', 'hooks/*.test.{ts,tsx}', 'services/*.test.{ts,tsx}'],
   }
 });
