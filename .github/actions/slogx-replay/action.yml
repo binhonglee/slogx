@@ -1,0 +1,270 @@
+name: "slogx replay publisher"
+description: "Publish slogx CI-mode NDJSON to a branch and comment a replay link"
+inputs:
+  log_paths:
+    description: "Comma or newline-separated list of NDJSON log file paths"
+    required: true
+  replay_base_url:
+    description: "Base URL to replay.html (ex: https://example.com/replay.html)"
+    required: false
+    default: "https://binhonglee.github.io/slogx/replay.html"
+  github_token:
+    description: "Token with contents:write and pull-requests:write"
+    required: true
+  artifact_branch:
+    description: "Branch that stores slogx CI logs"
+    required: false
+    default: "slogx-artifacts"
+  artifact_dir:
+    description: "Directory within the artifacts branch"
+    required: false
+    default: "ci-logs"
+  artifact_name:
+    description: "Name used in the stored filename"
+    required: false
+    default: "slogx"
+  max_runs:
+    description: "Maximum number of CI run IDs to keep in the artifacts branch"
+    required: false
+    default: "500"
+  pr_number:
+    description: "PR number to comment on (optional)"
+    required: false
+  comment:
+    description: "Whether to comment on the PR"
+    required: false
+    default: "true"
+  commit_message:
+    description: "Commit message for artifact updates"
+    required: false
+    default: "chore(slogx): add CI log"
+  git_user_name:
+    description: "Git user.name for the artifacts commit"
+    required: false
+    default: "slogx-bot"
+  git_user_email:
+    description: "Git user.email for the artifacts commit"
+    required: false
+    default: "slogx-bot@users.noreply.github.com"
+outputs:
+  raw_urls:
+    description: "Raw GitHub URLs for the NDJSON files (newline-separated)"
+    value: ${{ steps.publish.outputs.raw_urls }}
+  replay_urls:
+    description: "Replay URLs with ?url= prefilled (newline-separated)"
+    value: ${{ steps.publish.outputs.replay_urls }}
+  artifact_paths:
+    description: "Paths to the NDJSON files within the artifacts branch (newline-separated)"
+    value: ${{ steps.publish.outputs.artifact_paths }}
+runs:
+  using: "composite"
+  steps:
+    - id: prepare
+      shell: bash
+      env:
+        LOG_PATHS: ${{ inputs.log_paths }}
+        REPLAY_BASE_URL: ${{ inputs.replay_base_url }}
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        ARTIFACT_BRANCH: ${{ inputs.artifact_branch }}
+        ARTIFACT_DIR: ${{ inputs.artifact_dir }}
+        ARTIFACT_NAME: ${{ inputs.artifact_name }}
+        MAX_RUNS: ${{ inputs.max_runs }}
+        COMMIT_MESSAGE: ${{ inputs.commit_message }}
+        GIT_USER_NAME: ${{ inputs.git_user_name }}
+        GIT_USER_EMAIL: ${{ inputs.git_user_email }}
+      run: |
+        set -euo pipefail
+
+        PATHS=()
+        if [ -n "${LOG_PATHS:-}" ]; then
+          while IFS= read -r line || [ -n "$line" ]; do
+            [ -n "$line" ] && PATHS+=("$line")
+          done < <(printf '%s\n' "$LOG_PATHS" | tr ',' '\n')
+        fi
+        if [ ${#PATHS[@]} -eq 0 ]; then
+          echo "::error::No log paths provided. Set log_paths."
+          exit 1
+        fi
+
+        SAFE_NAME=$(echo "$ARTIFACT_NAME" | tr -cs 'A-Za-z0-9._-' '_')
+        SAFE_NAME=${SAFE_NAME##_}
+        SAFE_NAME=${SAFE_NAME%%_}
+        if [ -z "$SAFE_NAME" ]; then
+          SAFE_NAME="slogx"
+        fi
+
+        RUN_ID=${GITHUB_RUN_ID:-manual}
+        RUN_ATTEMPT=${GITHUB_RUN_ATTEMPT:-1}
+        DEST_FILE="${RUN_ID}_${RUN_ATTEMPT}_${SAFE_NAME}.ndjson"
+        DEST_PATH="${ARTIFACT_DIR}/${DEST_FILE}"
+
+        REPO="${GITHUB_REPOSITORY}"
+        TMP_DIR=$(mktemp -d)
+
+        git -C "$TMP_DIR" init -q
+        git -C "$TMP_DIR" config user.name "$GIT_USER_NAME"
+        git -C "$TMP_DIR" config user.email "$GIT_USER_EMAIL"
+        git -C "$TMP_DIR" remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO}.git"
+
+        if git -C "$TMP_DIR" fetch origin "$ARTIFACT_BRANCH" --depth=1; then
+          git -C "$TMP_DIR" checkout -b "$ARTIFACT_BRANCH" "origin/$ARTIFACT_BRANCH"
+        else
+          git -C "$TMP_DIR" checkout --orphan "$ARTIFACT_BRANCH"
+          git -C "$TMP_DIR" rm -rf . >/dev/null 2>&1 || true
+        fi
+
+        mkdir -p "$TMP_DIR/$ARTIFACT_DIR"
+        DEST_PATHS=()
+        TOTAL_COUNT=${#PATHS[@]}
+        INDEX=1
+        for path in "${PATHS[@]}"; do
+          if [ ! -f "$path" ]; then
+            echo "::error::Log file not found: $path"
+            exit 1
+          fi
+          if [ "$TOTAL_COUNT" -gt 1 ]; then
+            DEST_FILE="${RUN_ID}_${RUN_ATTEMPT}_${SAFE_NAME}_${INDEX}.ndjson"
+          else
+            DEST_FILE="${RUN_ID}_${RUN_ATTEMPT}_${SAFE_NAME}.ndjson"
+          fi
+          DEST_PATH="${ARTIFACT_DIR}/${DEST_FILE}"
+          cp "$path" "$TMP_DIR/$DEST_PATH"
+          DEST_PATHS+=("$DEST_PATH")
+          INDEX=$((INDEX + 1))
+        done
+        printf '%s\n' "${DEST_PATHS[@]}" > "$TMP_DIR/.slogx_dest_paths"
+
+        echo "tmp_dir=$TMP_DIR" >> "$GITHUB_OUTPUT"
+        echo "dest_paths_file=$TMP_DIR/.slogx_dest_paths" >> "$GITHUB_OUTPUT"
+
+    - name: Prune old logs
+      uses: actions/github-script@v7
+      env:
+        TMP_DIR: ${{ steps.prepare.outputs.tmp_dir }}
+        ARTIFACT_DIR: ${{ inputs.artifact_dir }}
+        MAX_RUNS: ${{ inputs.max_runs }}
+      with:
+        script: |
+          const fs = require('fs');
+          const path = require('path');
+
+          const maxRuns = Number(process.env.MAX_RUNS || '0');
+          if (!maxRuns || maxRuns <= 0) {
+            core.info('max_runs <= 0; skipping pruning.');
+            return;
+          }
+
+          const artifactDir = path.join(process.env.TMP_DIR, process.env.ARTIFACT_DIR);
+          if (!fs.existsSync(artifactDir)) {
+            core.info('Artifact directory not found; skipping pruning.');
+            return;
+          }
+
+          const entries = fs.readdirSync(artifactDir);
+          const runMap = new Map();
+
+          for (const name of entries) {
+            if (!name.endsWith('.ndjson')) continue;
+            const prefix = name.split('_', 1)[0];
+            if (!/^\d+$/.test(prefix || '')) continue;
+            const runId = Number(prefix);
+            if (!runMap.has(runId)) runMap.set(runId, []);
+            runMap.get(runId).push(name);
+          }
+
+          const runIds = Array.from(runMap.keys()).sort((a, b) => a - b);
+          const excess = runIds.length - maxRuns;
+          for (const runId of runIds.slice(0, Math.max(0, excess))) {
+            for (const name of runMap.get(runId)) {
+              fs.unlinkSync(path.join(artifactDir, name));
+            }
+          }
+
+    - id: publish
+      shell: bash
+      env:
+        TMP_DIR: ${{ steps.prepare.outputs.tmp_dir }}
+        DEST_PATHS_FILE: ${{ steps.prepare.outputs.dest_paths_file }}
+        REPLAY_BASE_URL: ${{ inputs.replay_base_url }}
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        ARTIFACT_BRANCH: ${{ inputs.artifact_branch }}
+        COMMIT_MESSAGE: ${{ inputs.commit_message }}
+      run: |
+        set -euo pipefail
+
+        git -C "$TMP_DIR" add -A
+        if git -C "$TMP_DIR" diff --cached --quiet; then
+          echo "No changes to commit."
+        else
+          git -C "$TMP_DIR" commit -m "$COMMIT_MESSAGE"
+          git -C "$TMP_DIR" push -u origin "$ARTIFACT_BRANCH"
+        fi
+
+        mapfile -t DEST_PATHS < "$DEST_PATHS_FILE"
+        RAW_URLS=()
+        REPLAY_URLS=()
+        for dest in "${DEST_PATHS[@]}"; do
+          RAW_URL="https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${ARTIFACT_BRANCH}/${dest}"
+          ENCODED_RAW_URL=$(RAW_URL="$RAW_URL" node -e "console.log(encodeURIComponent(process.env.RAW_URL))")
+
+          if [[ "$REPLAY_BASE_URL" == *\?* ]]; then
+            SEP="&"
+          else
+            SEP="?"
+          fi
+
+          REPLAY_URL="${REPLAY_BASE_URL}${SEP}url=${ENCODED_RAW_URL}"
+          RAW_URLS+=("$RAW_URL")
+          REPLAY_URLS+=("$REPLAY_URL")
+        done
+
+        {
+          echo "raw_urls<<EOF"
+          printf '%s\n' "${RAW_URLS[@]}"
+          echo "EOF"
+          echo "replay_urls<<EOF"
+          printf '%s\n' "${REPLAY_URLS[@]}"
+          echo "EOF"
+          echo "artifact_paths<<EOF"
+          printf '%s\n' "${DEST_PATHS[@]}"
+          echo "EOF"
+        } >> "$GITHUB_OUTPUT"
+
+    - name: Comment on PR
+      if: ${{ inputs.comment == 'true' }}
+      uses: actions/github-script@v7
+      env:
+        REPLAY_URLS: ${{ steps.publish.outputs.replay_urls }}
+        RAW_URLS: ${{ steps.publish.outputs.raw_urls }}
+        PR_NUMBER: ${{ inputs.pr_number }}
+      with:
+        github-token: ${{ inputs.github_token }}
+        script: |
+          const prNumber = process.env.PR_NUMBER || context.payload.pull_request?.number;
+          if (!prNumber) {
+            core.info('No PR number found; skipping comment.');
+            return;
+          }
+          const replayUrls = (process.env.REPLAY_URLS || '').split('\n').filter(Boolean);
+          const rawUrls = (process.env.RAW_URLS || '').split('\n').filter(Boolean);
+          if (replayUrls.length === 0 && rawUrls.length === 0) {
+            core.info('No URLs found; skipping comment.');
+            return;
+          }
+          const lines = ['## slogx replay ready', ''];
+          const max = Math.max(replayUrls.length, rawUrls.length);
+          for (let i = 0; i < max; i++) {
+            const replay = replayUrls[i] || '';
+            const raw = rawUrls[i] || '';
+            const parts = [];
+            if (replay) parts.push(`[Replay](${replay})`);
+            if (raw) parts.push(`[Raw log](${raw})`);
+            lines.push(`- Log ${i + 1}: ${parts.join(' | ')}`.trim());
+          }
+          const body = lines.join('\n');
+          await github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: Number(prNumber),
+            body
+          });

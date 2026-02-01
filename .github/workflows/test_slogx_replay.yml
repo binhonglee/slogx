@@ -1,0 +1,44 @@
+name: test_slogx_replay
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+# Required for slogx-replay action
+permissions:
+  contents: write        # Push to slogx-artifacts branch
+  pull-requests: write   # Comment on PRs
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Use Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "25.0.0"
+
+      - name: Install TypeScript SDK
+        run: npm i
+        working-directory: ./sdk/ts
+
+      - name: Generate sample logs (CI mode)
+        working-directory: ./sdk/ts
+        run: |
+          timeout 5 npm run server -- --ci || true
+          echo "Generated logs:"
+          ls -la slogx_logs/
+          echo "Log content (first 10 lines):"
+          head -10 slogx_logs/auth-service.ndjson
+
+      - name: Test slogx-replay action
+        uses: ./.github/actions/slogx-replay
+        with:
+          log_paths: ./sdk/ts/slogx_logs/auth-service.ndjson
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          pr_number: ${{ github.event.pull_request.number }}
+          artifact_name: slogx-replay-test
