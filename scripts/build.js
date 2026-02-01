@@ -9,7 +9,7 @@ import { build } from 'vite';
 import preact from '@preact/preset-vite';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { existsSync, mkdirSync, rmSync } from 'fs';
+import { existsSync, mkdirSync, rmSync, copyFileSync } from 'fs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.join(__dirname, '..');
@@ -22,7 +22,7 @@ if (existsSync(distDir)) {
 mkdirSync(distDir);
 
 const entries = [
-  { name: 'main', input: 'index.html' },
+  { name: 'app', input: 'app.html' },
   { name: 'replay', input: 'replay.html' },
 ];
 
@@ -53,6 +53,10 @@ for (const entry of entries) {
     logLevel: 'info',
   });
 }
+
+// Copy static landing page to dist
+console.log('\nCopying landing page...');
+copyFileSync(path.join(rootDir, 'index.html'), path.join(distDir, 'index.html'));
 
 // Run the inline script
 console.log('\nInlining assets...');

@@ -1,13 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>slogx</title>
-    <link rel="icon" type="image/png" href="/assets/icon.png" />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>slogx - good ol' print debugging, but better</title>
+  <link rel="icon" type="image/png" href="/assets/icon.png" />
+  <link rel="stylesheet" href="/styles/landing.css" />
+</head>
+<body>
+  <main class="landing">
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-content">
+        <div class="logo-row">
+          <img src="/assets/full_logo.png" alt="slogx" class="logo" />
+        </div>
+        <p class="tagline">good ol' print debugging — but better</p>
+        <p class="subtitle">Stream structured logs from your backend to a browser UI. Replay them from CI.</p>
+        <div class="cta-buttons">
+          <a href="/app.html" class="btn btn-primary">Try Live Demo</a>
+          <a href="https://github.com/binhonglee/slogx" class="btn btn-secondary">View on GitHub</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Two Modes -->
+    <section class="modes">
+      <div class="mode-card">
+        <div class="mode-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+          </svg>
+        </div>
+        <h3>Live Mode</h3>
+        <p>Connect to your running server via WebSocket. See logs as they happen.</p>
+        <a href="/app.html" class="mode-link">Open Live Viewer</a>
+      </div>
+      <div class="mode-card">
+        <div class="mode-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+          </svg>
+        </div>
+        <h3>Replay Mode</h3>
+        <p>Write logs to NDJSON during test runs. Replay them later with a link in your PR.</p>
+        <a href="/replay.html" class="mode-link">Open Replay Viewer</a>
+      </div>
+    </section>
+
+    <!-- Quickstart -->
+    <section class="quickstart">
+      <h2>Get started in 2 lines</h2>
+      <div class="lang-tabs">
+        <button class="lang-tab active" data-lang="node">Node</button>
+        <button class="lang-tab" data-lang="python">Python</button>
+        <button class="lang-tab" data-lang="go">Go</button>
+        <button class="lang-tab" data-lang="rust">Rust</button>
+      </div>
+      <div class="code-blocks">
+        <pre class="code-block active" data-lang="node"><code><span class="comment">// npm install @binhonglee/slogx</span>
+<span class="keyword">import</span> { slogx } <span class="keyword">from</span> <span class="string">'@binhonglee/slogx'</span>;
+
+slogx.init({ isDev: <span class="keyword">true</span>, port: <span class="number">8080</span>, serviceName: <span class="string">'api'</span> });
+slogx.info(<span class="string">'ready'</span>, { port: <span class="number">8080</span> });</code></pre>
+        <pre class="code-block" data-lang="python"><code><span class="comment"># pip install slogx</span>
+<span class="keyword">from</span> slogx <span class="keyword">import</span> slogx
+
+slogx.init(is_dev=<span class="keyword">True</span>, port=<span class="number">8080</span>, service_name=<span class="string">'api'</span>)
+slogx.info(<span class="string">'ready'</span>, {<span class="string">'port'</span>: <span class="number">8080</span>})</code></pre>
+        <pre class="code-block" data-lang="go"><code><span class="comment">// go get github.com/binhonglee/slogx</span>
+<span class="keyword">import</span> <span class="string">"github.com/binhonglee/slogx"</span>
+
+slogx.Init(slogx.Config{IsDev: <span class="keyword">true</span>, Port: <span class="number">8080</span>, ServiceName: <span class="string">"api"</span>})
+slogx.Info(<span class="string">"ready"</span>, <span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">any</span>{<span class="string">"port"</span>: <span class="number">8080</span>})</code></pre>
+        <pre class="code-block" data-lang="rust"><code><span class="comment">// cargo add slogx</span>
+slogx::init(<span class="keyword">true</span>, <span class="number">8080</span>, <span class="string">"api"</span>).<span class="keyword">await</span>;
+slogx::info!(<span class="string">"ready"</span>, { <span class="string">"port"</span>: <span class="number">8080</span> });</code></pre>
+      </div>
+      <p class="code-note">Works in live mode by default. Add <code>ciMode: true</code> for CI.</p>
+    </section>
+
+    <!-- GitHub Action -->
+    <section class="gh-action">
+      <h2>Replay logs from CI</h2>
+      <p class="gh-subtitle">Run tests, capture logs, get a replay link in your PR.</p>
+      <pre class="code-block yaml"><code><span class="comment"># .github/workflows/test.yml</span>
+- <span class="keyword">uses</span>: binhonglee/slogx/replay@main
+  <span class="keyword">with</span>:
+    <span class="keyword">log_paths</span>: ./slogx_logs/*.ndjson
+    <span class="keyword">github_token</span>: ${{ secrets.GITHUB_TOKEN }}</code></pre>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-links">
+        <a href="https://github.com/binhonglee/slogx">GitHub</a>
+        <a href="https://github.com/binhonglee/slogx#readme">README</a>
+        <a href="/app.html">Live Demo</a>
+        <a href="/replay.html">Replay Demo</a>
+      </div>
+      <p class="footer-note">SDKs available for Node, Python, Go, and Rust</p>
+    </footer>
+  </main>
+
+  <script>
+    // Language tab switching
+    document.querySelectorAll('.lang-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const lang = tab.dataset.lang;
+        document.querySelectorAll('.lang-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.code-block').forEach(b => b.classList.remove('active'));
+        tab.classList.add('active');
+        document.querySelector(`.code-block[data-lang="${lang}"]`).classList.add('active');
+      });
+    });
+  </script>
+</body>
 </html>

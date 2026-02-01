@@ -8,7 +8,7 @@ test.describe('SDK WebSocket Integration', () => {
       const port = await getAvailablePort(0);
       const proc = await startSdkProcess(`${sdk.name} WS`, sdk.wsCommand(port), 30000);
       try {
-        await page.goto('/');
+        await page.goto('/app.html');
 
         const input = page.locator('.connection-form input');
         await input.fill(`localhost:${port}`);

@@ -1,5 +1,9 @@
 name: "slogx replay publisher"
 description: "Publish slogx CI-mode NDJSON to a branch and comment a replay link"
+author: "binhonglee"
+branding:
+  icon: "play-circle"
+  color: "blue"
 inputs:
   log_paths:
     description: "Comma or newline-separated list of NDJSON log file paths"
