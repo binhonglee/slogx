@@ -1,0 +1,184 @@
+/* FullScreenDropZone styles */
+
+.fullscreen-dropzone {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
+}
+
+.fullscreen-dropzone.dragging {
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.dropzone-content {
+  text-align: center;
+  max-width: 480px;
+}
+
+/* Default state */
+.default-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.default-state .upload-icon {
+  color: var(--slate-400);
+  margin-bottom: 0.5rem;
+}
+
+.default-state h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--slate-100);
+}
+
+.default-state p {
+  color: var(--slate-400);
+  margin-bottom: 0.5rem;
+}
+
+.default-state code {
+  background: var(--slate-800);
+  padding: 0.125rem 0.375rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+/* Action buttons */
+.action-buttons {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.btn-primary,
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: none;
+}
+
+.btn-primary {
+  background: var(--blue-600);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--blue-500);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: var(--slate-700);
+  color: var(--slate-200);
+  border: 1px solid var(--slate-600);
+}
+
+.btn-secondary:hover {
+  background: var(--slate-600);
+}
+
+/* Drag overlay */
+.drag-overlay {
+  position: absolute;
+  inset: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  background: rgba(59, 130, 246, 0.15);
+  border: 2px dashed var(--blue-500);
+  border-radius: 12px;
+  color: var(--blue-400);
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+/* Loading state */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  color: var(--slate-400);
+}
+
+.loading-state h3 {
+  color: var(--slate-300);
+}
+
+/* URL input state */
+.url-input-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.url-input-state h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--slate-100);
+}
+
+.url-input-state p {
+  color: var(--slate-400);
+  font-size: 0.875rem;
+}
+
+.url-input-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.url-input-form input[type="url"] {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--slate-800);
+  border: 1px solid var(--slate-600);
+  border-radius: 8px;
+  color: var(--slate-100);
+  font-size: 0.875rem;
+}
+
+.url-input-form input[type="url"]:focus {
+  outline: none;
+  border-color: var(--blue-500);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.url-input-form input[type="url"]::placeholder {
+  color: var(--slate-500);
+}
+
+.url-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.error-message {
+  color: var(--red-400);
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}

@@ -13,14 +13,7 @@ export default defineConfig({
       '@': path.resolve(__dirname, '.'),
     }
   },
-  build: {
-    cssCodeSplit: false,
-    rollupOptions: {
-      output: {
-        inlineDynamicImports: true,
-      }
-    }
-  },
+  // Build config is in scripts/build.js for separate entry point builds
   test: {
     globals: true,
     environment: 'jsdom',

@@ -5,7 +5,7 @@
   "description": "Real-time backend log viewer",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node scripts/inline.js",
+    "build": "node scripts/build.js",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
