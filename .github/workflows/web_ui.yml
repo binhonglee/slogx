@@ -57,7 +57,7 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run E2E tests
-        run: npm run test:e2e
+        run: SLOGX_PYTHON="$GITHUB_WORKSPACE/.venv/bin/python" npm run test:e2e
 
       - uses: actions/upload-artifact@v6
         if: always()

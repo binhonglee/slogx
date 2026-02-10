@@ -29,10 +29,11 @@ vi.mock('../components/FilterBar', () => ({
 }));
 
 vi.mock('../components/FullScreenDropZone', () => ({
-    default: ({ onFileLoad, onUrlLoad }: any) => (
+    default: ({ onFileLoad, onUrlLoad, onDemoLoad }: any) => (
         <div data-testid="dropzone">
             <button onClick={() => onFileLoad(new File(['{}'], 'test.ndjson'))}>Load File</button>
             <button onClick={() => onUrlLoad('https://example.com/logs.ndjson')}>Load URL</button>
+            <button onClick={() => onDemoLoad()}>Load Demo</button>
         </div>
     )
 }));
@@ -110,6 +111,25 @@ describe('ReplayApp', () => {
 
         // LogList should show count
         expect(screen.getByText('Count: 2')).toBeDefined();
+    });
+
+    it('loads CI demo logs from dropzone action', async () => {
+        const mockLogs = [
+            { id: '1', timestamp: '2024-01-01T10:00:00Z', level: LogLevel.INFO, args: ['demo'], metadata: {} }
+        ];
+
+        vi.spyOn(fileParser, 'parseNDJSON').mockResolvedValue(mockLogs);
+
+        render(<ReplayApp />);
+
+        fireEvent.click(screen.getByText('Load Demo'));
+
+        await waitFor(() => {
+            expect(fileParser.parseNDJSON).toHaveBeenCalled();
+        });
+
+        expect(screen.getByText('ci-demo.ndjson')).toBeDefined();
+        expect(screen.getByText('Count: 1')).toBeDefined();
     });
 
     it('clears logs when cleared from header', async () => {

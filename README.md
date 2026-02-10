@@ -138,7 +138,7 @@ slogx.init({
 
 **View replay logs:**
 1. Open the replay UI (`/replay.html`)
-2. Drop in an `.ndjson` file or paste a URL
+2. Drop in an `.ndjson` file, paste a URL, or click **Try Demo CI Logs**
 3. Browse logs with the same filtering and search as live mode
 
 ## GitHub Action

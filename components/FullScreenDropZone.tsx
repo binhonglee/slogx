@@ -1,13 +1,14 @@
 import { FunctionComponent } from 'preact';
 import { useRef, useState } from 'preact/hooks';
-import { UploadCloud, Link, RefreshCw, X } from 'lucide-preact';
+import { UploadCloud, Link, RefreshCw, FlaskConical } from 'lucide-preact';
 
 interface FullScreenDropZoneProps {
     onFileLoad: (file: File) => void;
     onUrlLoad: (url: string) => Promise<void>;
+    onDemoLoad: () => Promise<void>;
 }
 
-const FullScreenDropZone: FunctionComponent<FullScreenDropZoneProps> = ({ onFileLoad, onUrlLoad }) => {
+const FullScreenDropZone: FunctionComponent<FullScreenDropZoneProps> = ({ onFileLoad, onUrlLoad, onDemoLoad }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isDragging, setIsDragging] = useState(false);
     const [showUrlInput, setShowUrlInput] = useState(false);
@@ -53,6 +54,18 @@ const FullScreenDropZone: FunctionComponent<FullScreenDropZoneProps> = ({ onFile
         setIsDragging(false);
         if (e.dataTransfer?.files?.[0]) {
             handleFile(e.dataTransfer.files[0]);
+        }
+    };
+
+    const handleDemoLoad = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            await onDemoLoad();
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to load demo logs');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -136,7 +149,16 @@ const FullScreenDropZone: FunctionComponent<FullScreenDropZoneProps> = ({ onFile
                                 <Link size={16} />
                                 Load from URL
                             </button>
+                            <button
+                                className="btn-secondary"
+                                onClick={handleDemoLoad}
+                            >
+                                <FlaskConical size={16} />
+                                Try Demo CI Logs
+                            </button>
                         </div>
+
+                        {error && <div className="error-message">{error}</div>}
 
                         {isDragging && (
                             <div className="drag-overlay">

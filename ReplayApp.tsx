@@ -10,6 +10,7 @@ import { useLogFilter } from './hooks/useLogFilter';
 import { useSplitPane } from './hooks/useSplitPane';
 import { useToggleSelection } from './hooks/useToggleSelection';
 import { parseNDJSON } from './services/fileParser';
+import { createCIDemoFile } from './services/ciDemo';
 import { Settings, FileText, RefreshCw, X } from 'lucide-preact';
 
 const ReplayApp: FunctionComponent = () => {
@@ -56,6 +57,11 @@ const ReplayApp: FunctionComponent = () => {
         await handleFileLoad(file);
     };
 
+    const handleDemoLoad = async () => {
+        const file = createCIDemoFile();
+        await handleFileLoad(file);
+    };
+
     // Check for ?url= query param on mount
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
@@ -98,6 +104,7 @@ const ReplayApp: FunctionComponent = () => {
                 <FullScreenDropZone
                     onFileLoad={handleFileLoad}
                     onUrlLoad={handleUrlLoad}
+                    onDemoLoad={handleDemoLoad}
                 />
 
                 <SetupModal isOpen={showSetup} onClose={() => setShowSetup(false)} />

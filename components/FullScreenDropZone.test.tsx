@@ -5,21 +5,33 @@ import FullScreenDropZone from './FullScreenDropZone';
 describe('FullScreenDropZone', () => {
     const mockOnFileLoad = vi.fn();
     const mockOnUrlLoad = vi.fn();
+    const mockOnDemoLoad = vi.fn();
 
     beforeEach(() => {
         vi.resetAllMocks();
     });
 
+    const renderDropZone = () => {
+        render(
+            <FullScreenDropZone
+                onFileLoad={mockOnFileLoad}
+                onUrlLoad={mockOnUrlLoad}
+                onDemoLoad={mockOnDemoLoad}
+            />
+        );
+    };
+
     it('renders default state with upload instructions', () => {
-        render(<FullScreenDropZone onFileLoad={mockOnFileLoad} onUrlLoad={mockOnUrlLoad} />);
+        renderDropZone();
 
         expect(screen.getByText('Load Log File')).toBeDefined();
         expect(screen.getByText('Browse Files')).toBeDefined();
         expect(screen.getByText('Load from URL')).toBeDefined();
+        expect(screen.getByText('Try Demo CI Logs')).toBeDefined();
     });
 
     it('handles file drop', async () => {
-        render(<FullScreenDropZone onFileLoad={mockOnFileLoad} onUrlLoad={mockOnUrlLoad} />);
+        renderDropZone();
 
         const dropzone = document.querySelector('.fullscreen-dropzone');
         const file = new File(['test content'], 'test.ndjson', { type: 'application/x-ndjson' });
@@ -34,7 +46,7 @@ describe('FullScreenDropZone', () => {
     });
 
     it('shows dragging state on drag over', () => {
-        render(<FullScreenDropZone onFileLoad={mockOnFileLoad} onUrlLoad={mockOnUrlLoad} />);
+        renderDropZone();
 
         const dropzone = document.querySelector('.fullscreen-dropzone');
 
@@ -44,7 +56,7 @@ describe('FullScreenDropZone', () => {
     });
 
     it('removes dragging state on drag leave', () => {
-        render(<FullScreenDropZone onFileLoad={mockOnFileLoad} onUrlLoad={mockOnUrlLoad} />);
+        renderDropZone();
 
         const dropzone = document.querySelector('.fullscreen-dropzone');
 
@@ -56,7 +68,7 @@ describe('FullScreenDropZone', () => {
     });
 
     it('switches to URL input mode when clicking Load from URL', () => {
-        render(<FullScreenDropZone onFileLoad={mockOnFileLoad} onUrlLoad={mockOnUrlLoad} />);
+        renderDropZone();
 
         fireEvent.click(screen.getByText('Load from URL'));
 
@@ -66,21 +78,20 @@ describe('FullScreenDropZone', () => {
     });
 
     it('cancels URL input mode', () => {
-        render(<FullScreenDropZone onFileLoad={mockOnFileLoad} onUrlLoad={mockOnUrlLoad} />);
+        renderDropZone();
 
         fireEvent.click(screen.getByText('Load from URL'));
         expect(screen.getByPlaceholderText('https://example.com/logs.ndjson')).toBeDefined();
 
         fireEvent.click(screen.getByText('Cancel'));
 
-        // Should be back to default state
         expect(screen.getByText('Browse Files')).toBeDefined();
     });
 
     it('calls onUrlLoad with URL when submitted', async () => {
         mockOnUrlLoad.mockResolvedValue(undefined);
 
-        render(<FullScreenDropZone onFileLoad={mockOnFileLoad} onUrlLoad={mockOnUrlLoad} />);
+        renderDropZone();
 
         fireEvent.click(screen.getByText('Load from URL'));
 
@@ -97,7 +108,7 @@ describe('FullScreenDropZone', () => {
     it('shows error message when URL load fails', async () => {
         mockOnUrlLoad.mockRejectedValue(new Error('Network error'));
 
-        render(<FullScreenDropZone onFileLoad={mockOnFileLoad} onUrlLoad={mockOnUrlLoad} />);
+        renderDropZone();
 
         fireEvent.click(screen.getByText('Load from URL'));
 
@@ -112,7 +123,7 @@ describe('FullScreenDropZone', () => {
     });
 
     it('disables Load button when URL is empty', () => {
-        render(<FullScreenDropZone onFileLoad={mockOnFileLoad} onUrlLoad={mockOnUrlLoad} />);
+        renderDropZone();
 
         fireEvent.click(screen.getByText('Load from URL'));
 
@@ -121,9 +132,8 @@ describe('FullScreenDropZone', () => {
     });
 
     it('opens file picker when Browse Files is clicked', () => {
-        render(<FullScreenDropZone onFileLoad={mockOnFileLoad} onUrlLoad={mockOnUrlLoad} />);
+        renderDropZone();
 
-        // Mock the file input click
         const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
         const clickSpy = vi.spyOn(fileInput, 'click');
 
@@ -133,7 +143,7 @@ describe('FullScreenDropZone', () => {
     });
 
     it('handles file selection via input', () => {
-        render(<FullScreenDropZone onFileLoad={mockOnFileLoad} onUrlLoad={mockOnUrlLoad} />);
+        renderDropZone();
 
         const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
         const file = new File(['test'], 'test.ndjson');
@@ -145,14 +155,13 @@ describe('FullScreenDropZone', () => {
     });
 
     it('shows loading state while URL is being fetched', async () => {
-        // Create a promise that we can control
         let resolveLoad: () => void;
         const loadPromise = new Promise<void>((resolve) => {
             resolveLoad = resolve;
         });
         mockOnUrlLoad.mockReturnValue(loadPromise);
 
-        render(<FullScreenDropZone onFileLoad={mockOnFileLoad} onUrlLoad={mockOnUrlLoad} />);
+        renderDropZone();
 
         fireEvent.click(screen.getByText('Load from URL'));
 
@@ -161,19 +170,17 @@ describe('FullScreenDropZone', () => {
 
         fireEvent.click(screen.getByText('Load'));
 
-        // Should show loading state
         await waitFor(() => {
             expect(screen.getByText('Loading logs...')).toBeDefined();
         });
 
-        // Resolve the promise
         resolveLoad!();
     });
 
     it('shows fallback error message for non-Error exceptions', async () => {
         mockOnUrlLoad.mockRejectedValue('string error');
 
-        render(<FullScreenDropZone onFileLoad={mockOnFileLoad} onUrlLoad={mockOnUrlLoad} />);
+        renderDropZone();
 
         fireEvent.click(screen.getByText('Load from URL'));
 
@@ -188,7 +195,7 @@ describe('FullScreenDropZone', () => {
     });
 
     it('does not submit when URL is only whitespace', () => {
-        render(<FullScreenDropZone onFileLoad={mockOnFileLoad} onUrlLoad={mockOnUrlLoad} />);
+        renderDropZone();
 
         fireEvent.click(screen.getByText('Load from URL'));
 
@@ -202,7 +209,7 @@ describe('FullScreenDropZone', () => {
     });
 
     it('ignores drop without files', () => {
-        render(<FullScreenDropZone onFileLoad={mockOnFileLoad} onUrlLoad={mockOnUrlLoad} />);
+        renderDropZone();
 
         const dropzone = document.querySelector('.fullscreen-dropzone');
 
@@ -218,7 +225,7 @@ describe('FullScreenDropZone', () => {
     it('clears error when cancel is clicked', async () => {
         mockOnUrlLoad.mockRejectedValue(new Error('Some error'));
 
-        render(<FullScreenDropZone onFileLoad={mockOnFileLoad} onUrlLoad={mockOnUrlLoad} />);
+        renderDropZone();
 
         fireEvent.click(screen.getByText('Load from URL'));
 
@@ -233,17 +240,15 @@ describe('FullScreenDropZone', () => {
 
         fireEvent.click(screen.getByText('Cancel'));
 
-        // Back to default state, error should be cleared
         expect(screen.queryByText('Some error')).toBeNull();
         expect(screen.getByText('Browse Files')).toBeDefined();
     });
 
     it('ignores file input change when no files selected', () => {
-        render(<FullScreenDropZone onFileLoad={mockOnFileLoad} onUrlLoad={mockOnUrlLoad} />);
+        renderDropZone();
 
         const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
 
-        // Simulate change event with no files (e.g., user cancels file picker)
         Object.defineProperty(fileInput, 'files', { value: null, configurable: true });
         fireEvent.change(fileInput);
 
@@ -251,7 +256,7 @@ describe('FullScreenDropZone', () => {
     });
 
     it('ignores drop with null dataTransfer', () => {
-        render(<FullScreenDropZone onFileLoad={mockOnFileLoad} onUrlLoad={mockOnUrlLoad} />);
+        renderDropZone();
 
         const dropzone = document.querySelector('.fullscreen-dropzone');
 
@@ -262,5 +267,16 @@ describe('FullScreenDropZone', () => {
         fireEvent(dropzone!, dropEvent);
 
         expect(mockOnFileLoad).not.toHaveBeenCalled();
+    });
+
+    it('loads CI demo logs when demo button is clicked', async () => {
+        mockOnDemoLoad.mockResolvedValue(undefined);
+        renderDropZone();
+
+        fireEvent.click(screen.getByText('Try Demo CI Logs'));
+
+        await waitFor(() => {
+            expect(mockOnDemoLoad).toHaveBeenCalledTimes(1);
+        });
     });
 });
