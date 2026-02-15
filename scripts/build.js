@@ -9,7 +9,7 @@ import { build } from 'vite';
 import preact from '@preact/preset-vite';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { existsSync, mkdirSync, rmSync, copyFileSync } from 'fs';
+import { existsSync, mkdirSync, rmSync, copyFileSync, cpSync } from 'fs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.join(__dirname, '..');
@@ -57,6 +57,24 @@ for (const entry of entries) {
 // Copy static landing page to dist
 console.log('\nCopying landing page...');
 copyFileSync(path.join(rootDir, 'index.html'), path.join(distDir, 'index.html'));
+
+// Copy shared styles for the landing page and app UIs.
+const stylesSrc = path.join(rootDir, 'styles');
+const stylesDest = path.join(distDir, 'styles');
+if (existsSync(stylesSrc)) {
+  console.log('\nCopying shared styles...');
+  cpSync(stylesSrc, stylesDest, { recursive: true });
+}
+
+// Copy Docusaurus docs build output into dist/docs.
+const docsSrc = path.join(rootDir, 'website', 'build');
+const docsDest = path.join(distDir, 'docs');
+if (existsSync(path.join(docsSrc, 'index.html'))) {
+  console.log('\nCopying docs site...');
+  cpSync(docsSrc, docsDest, { recursive: true });
+} else {
+  console.warn('\nDocs build not found at website/build. Run `npm run docs:build` before `npm run build`.');
+}
 
 // Run the inline script
 console.log('\nInlining assets...');

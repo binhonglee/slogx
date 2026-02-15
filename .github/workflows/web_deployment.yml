@@ -19,10 +19,13 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "25.0.0"
+          node-version: "24.x"
 
       - name: Install npm
-        run: npm i
+        run: npm ci
+
+      - name: Build docs
+        run: npm run docs:build
 
       - name: Build
         run: npm run build

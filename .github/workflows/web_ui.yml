@@ -20,20 +20,12 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "25.0.0"
+          node-version: "24.x"
 
       - name: Use Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
-      - name: Use Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: "1.21"
-
-      - name: Use Rust
-        uses: dtolnay/rust-toolchain@stable
 
       - name: Install npm
         run: npm ci
@@ -46,6 +38,9 @@ jobs:
         run: |
           python -m venv .venv
           .venv/bin/pip install -r sdk/python/requirements.txt
+
+      - name: Build docs
+        run: npm run docs:build
 
       - name: Run Build
         run: npm run build
