@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "node scripts/build.js",
+    "docs:dev": "docusaurus start website --port 3001",
+    "docs:build": "docusaurus build website --out-dir build",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -19,6 +21,9 @@
     "ws": "8.18.1"
   },
   "devDependencies": {
+    "@docusaurus/core": "^3.8.1",
+    "@docusaurus/faster": "^3.8.1",
+    "@docusaurus/preset-classic": "^3.8.1",
     "@playwright/test": "1.57.0",
     "@preact/preset-vite": "2.10.2",
     "@testing-library/preact": "3.2.4",

@@ -42,6 +42,11 @@ sdk/go/slogx-demo
 # Rust
 sdk/rust/target/
 
+# Docs build output
+website/.docusaurus/
+website/build/
+website/website/
+
 # PHP
 vendor/
 composer.lock

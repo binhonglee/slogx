@@ -1,0 +1,10 @@
+{
+  "label": "SDKs",
+  "position": 7,
+  "link": {
+    "type": "generated-index",
+    "slug": "/sdks",
+    "title": "SDK Reference",
+    "description": "Language-specific setup and API surface for slogx SDKs."
+  }
+}
