@@ -1,6 +1,6 @@
 [package]
 name = "slogx"
-version = "0.0.1"
+version = "0.0.2"
 edition = "2021"
 description = "Real-time log streaming SDK for Rust"
 license = "MIT"
