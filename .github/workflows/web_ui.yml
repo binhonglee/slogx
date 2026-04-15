@@ -12,18 +12,18 @@ jobs:
       - uses: actions/checkout@v6
       - name: Cache node_modules
         id: cache-node-modules
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: ${{ hashFiles('**/package.json') }}-npm-v1
       
       - name: Use Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: "24.x"
 
       - name: Use Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.11"
 
@@ -54,7 +54,7 @@ jobs:
       - name: Run E2E tests
         run: SLOGX_PYTHON="$GITHUB_WORKSPACE/.venv/bin/python" npm run test:e2e
 
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: playwright-report-${{ matrix.node-version }}
@@ -62,7 +62,7 @@ jobs:
           retention-days: 30
 
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: binhonglee/slogx
