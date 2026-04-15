@@ -1,0 +1,117 @@
+version: 2
+updates:
+  # Maintain dependencies for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 5
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+
+  # Maintain dependencies for Golang (root)
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 5
+
+  # Maintain dependencies for pip (sdk/python)
+  - package-ecosystem: "pip"
+    directory: "/sdk/python"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 5
+
+  # Maintain dependencies for Cargo (sdk/rust)
+  - package-ecosystem: "cargo"
+    directory: "/sdk/rust"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 5
+    groups:
+      cargo-tokio:
+        patterns:
+          - "tokio*"
+      cargo-serde:
+        patterns:
+          - "serde*"
+
+  # Maintain dependencies for npm (root)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 5
+    groups:
+      docusaurus:
+        patterns:
+          - "@docusaurus/*"
+          - "docusaurus-*"
+      preact:
+        patterns:
+          - "preact"
+          - "*preact*"
+          - "@preact/*"
+      vitest:
+        patterns:
+          - "vitest"
+          - "@vitest/*"
+      playwright:
+        patterns:
+          - "@playwright/*"
+      vite:
+        patterns:
+          - "vite"
+          - "@vitejs/*"
+      websocket:
+        patterns:
+          - "ws"
+          - "@types/ws"
+      typescript:
+        patterns:
+          - "typescript"
+          - "@types/node"
+
+  # Maintain dependencies for npm (mcp)
+  - package-ecosystem: "npm"
+    directory: "/mcp"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 5
+    groups:
+      vitest:
+        patterns:
+          - "vitest"
+          - "@vitest/*"
+      websocket:
+        patterns:
+          - "ws"
+          - "@types/ws"
+      typescript:
+        patterns:
+          - "typescript"
+          - "@types/node"
+
+  # Maintain dependencies for npm (sdk/ts)
+  - package-ecosystem: "npm"
+    directory: "/sdk/ts"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 5
+    groups:
+      vitest:
+        patterns:
+          - "vitest"
+          - "@vitest/*"
+      websocket:
+        patterns:
+          - "ws"
+          - "@types/ws"
+      typescript:
+        patterns:
+          - "typescript"
+          - "@types/node"
+          - "tsx"
