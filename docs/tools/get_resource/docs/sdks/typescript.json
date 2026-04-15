@@ -1,0 +1,8 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"uri\": \"docs://docs/sdks/typescript\",\n  \"name\": \"TypeScript SDK\",\n  \"description\": \"docs content: TypeScript SDK\",\n  \"mimeType\": \"text/markdown\",\n  \"content\": \"Source: [`sdk/ts/slogx.ts`](https://github.com/binhonglee/slogx/blob/main/sdk/ts/slogx.ts)\\n\\n## Install\\n\\n```bash\\nnpm install @binhonglee/slogx\\n```\\n\\n## API\\n\\n```ts\\ninterface SlogConfig {\\n  isDev: boolean;\\n  port?: number;\\n  serviceName?: string;\\n  ciMode?: boolean;\\n  logFilePath?: string;\\n  maxEntries?: number;\\n}\\n\\nslogx.init(config: SlogConfig): Promise<void>;\\nslogx.close(): void;\\nslogx.debug(...args: any[]): void;\\nslogx.info(...args: any[]): void;\\nslogx.warn(...args: any[]): void;\\nslogx.error(...args: any[]): void;\\n```\\n\\n## Example\\n\\n```ts\\nimport { slogx } from '@binhonglee/slogx';\\n\\nawait slogx.init({ isDev: true, serviceName: 'api', port: 8080 });\\nslogx.info('request completed', { status: 200 });\\n```\\n\",\n  \"metadata\": {\n    \"title\": \"TypeScript SDK\",\n    \"sidebar_position\": 2\n  }\n}"
+    }
+  ]
+}

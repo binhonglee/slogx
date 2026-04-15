@@ -1,0 +1,13 @@
+{
+  "contents": [
+    {
+      "uri": "docs://docs/sdks/overview",
+      "mimeType": "text/markdown",
+      "text": "slogx has SDKs for TypeScript, Python, Go, and Rust.\n\nAll SDKs expose the same logging levels and comparable runtime controls:\n\n- live WebSocket mode for local development\n- CI NDJSON mode for replay\n- call-site metadata (`file`, `line`, `func`, `service`)\n- stacktrace capture (with special handling for exceptions/errors)\n\n## Shared config fields\n\n| Field | Type | Default | Purpose |\n| --- | --- | --- | --- |\n| `isDev` / `is_dev` / `IsDev` | bool | required | Safety gate for non-production usage |\n| `port` / `Port` | number | `8080` | WebSocket port in live mode |\n| `serviceName` / `service_name` / `ServiceName` | string | language-specific | Service label in metadata |\n| `ciMode` / `ci_mode` / `CIMode` | bool? | auto-detect | Force mode or rely on CI detection |\n| `logFilePath` / `log_file_path` / `LogFilePath` | string | `./slogx_logs/<service>.ndjson` | NDJSON output path |\n| `maxEntries` / `max_entries` / `MaxEntries` | number | `10000` | Rolling entry limit in CI mode |\n\n## Language pages\n\n- [TypeScript SDK](./typescript)\n- [Python SDK](./python)\n- [Go SDK](./go)\n- [Rust SDK](./rust)\n",
+      "metadata": {
+        "title": "SDK Overview",
+        "sidebar_position": 1
+      }
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "contents": [
+    {
+      "uri": "docs://docs/mcp/tools",
+      "mimeType": "text/markdown",
+      "text": "Source: [mcp/src/index.ts](https://github.com/binhonglee/slogx/blob/main/mcp/src/index.ts)\n\n## Available tools\n\n### `slogx_list`\n\nList active slogx connections.\n\n**Input schema**\n\n```json\n{}\n```\n\n### `slogx_connect`\n\nConnect to a slogx WebSocket server.\n\n**Input schema**\n\n```json\n{\n  \"url\": \"ws://localhost:8080\"\n}\n```\n\n### `slogx_disconnect`\n\nDisconnect from a slogx WebSocket server.\n\n**Input schema**\n\n```json\n{\n  \"url\": \"ws://localhost:8080\"\n}\n```\n\n### `slogx_search`\n\nSearch logs by keyword. Preferred over `slogx_get_logs` for efficiency.\n\n**Input schema**\n\n```json\n{\n  \"query\": \"payment failed\",\n  \"service\": \"checkout\",\n  \"level\": \"ERROR\",\n  \"limit\": 20\n}\n```\n\n- `query` required\n- `limit` default: `20`, max: `100`\n\n### `slogx_get_errors`\n\nGet recent error logs.\n\n**Input schema**\n\n```json\n{\n  \"service\": \"checkout\",\n  \"limit\": 20\n}\n```\n\n- `limit` default: `20`, max: `50`\n\n### `slogx_get_logs`\n\nGet recent logs with optional filters.\n\n**Input schema**\n\n```json\n{\n  \"service\": \"checkout\",\n  \"level\": \"INFO\",\n  \"limit\": 20\n}\n```\n\n- `limit` default: `20`, max: `50`\n\n### `slogx_get_details`\n\nGet full details for one log entry `id`.\n\n**Input schema**\n\n```json\n{\n  \"id\": \"abc-123\"\n}\n```\n\n## Response model\n\nList/search tools return compact entries:\n\n```json\n{\n  \"id\": \"abc-123\",\n  \"content\": \"10:30:45.123::ERROR::Payment failed::checkout::payment.ts:42\"\n}\n```\n\nDetail tool returns full fields:\n\n```json\n{\n  \"id\": \"abc-123\",\n  \"timestamp\": \"2025-01-15T10:30:45.123Z\",\n  \"level\": \"ERROR\",\n  \"args\": [\"Payment failed\", { \"code\": 500 }],\n  \"stacktrace\": \"Error: ...\",\n  \"metadata\": {\n    \"file\": \"payment.ts\",\n    \"line\": 42,\n    \"func\": \"processPayment\",\n    \"service\": \"checkout\"\n  }\n}\n```\n\n## Recommended debugging sequence\n\n1. `slogx_list`\n2. `slogx_connect`\n3. `slogx_get_errors` or `slogx_search`\n4. `slogx_get_details`\n",
+      "metadata": {
+        "title": "MCP Tool Reference",
+        "sidebar_position": 3
+      }
+    }
+  ]
+}

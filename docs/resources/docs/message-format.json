@@ -1,0 +1,13 @@
+{
+  "contents": [
+    {
+      "uri": "docs://docs/message-format",
+      "mimeType": "text/markdown",
+      "text": "Each log entry is serialized as JSON.\n\n```json\n{\n  \"id\": \"uuid-or-random-id\",\n  \"timestamp\": \"2026-02-13T12:34:56.789Z\",\n  \"level\": \"INFO\",\n  \"args\": [\"Server started\", { \"port\": 8080 }],\n  \"stacktrace\": \"optional stack trace\",\n  \"metadata\": {\n    \"file\": \"handler.go\",\n    \"line\": 123,\n    \"func\": \"handleRequest\",\n    \"lang\": \"node|python|go|rust\",\n    \"service\": \"my-service\"\n  }\n}\n```\n\nTransport differs by runtime mode:\n\n- **Live mode**: JSON payload over WebSocket.\n- **Replay mode**: newline-delimited JSON (`.ndjson`).\n",
+      "metadata": {
+        "title": "Message Format",
+        "sidebar_position": 5
+      }
+    }
+  ]
+}

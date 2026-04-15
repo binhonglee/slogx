@@ -1,0 +1,13 @@
+{
+  "contents": [
+    {
+      "uri": "docs://docs/sdks/rust",
+      "mimeType": "text/markdown",
+      "text": "Source: [`sdk/rust/src/lib.rs`](https://github.com/binhonglee/slogx/blob/main/sdk/rust/src/lib.rs)\n\n## Install\n\n```bash\ncargo add slogx\n```\n\n## API\n\n```rust\npub async fn init(is_dev: bool, port: u16, service_name: &str)\npub async fn init_with_config(\n    is_dev: bool,\n    port: u16,\n    service_name: &str,\n    ci_mode: Option<bool>,\n    log_file: Option<String>,\n    max_entries: Option<usize>,\n)\n\nslogx::debug!(...)\nslogx::info!(...)\nslogx::warn!(...)\nslogx::error!(...)\n```\n\n## Example\n\n```rust\n#[tokio::main]\nasync fn main() {\n    slogx::init(true, 8080, \"api\").await;\n    slogx::info!(\"request completed\", { \"status\": 200 });\n}\n```\n",
+      "metadata": {
+        "title": "Rust SDK",
+        "sidebar_position": 5
+      }
+    }
+  ]
+}

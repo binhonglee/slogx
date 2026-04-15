@@ -1,0 +1,8 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"uri\": \"docs://docs/sdks/go\",\n  \"name\": \"Go SDK\",\n  \"description\": \"docs content: Go SDK\",\n  \"mimeType\": \"text/markdown\",\n  \"content\": \"Source: [`sdk/go/slogx/slogx.go`](https://github.com/binhonglee/slogx/blob/main/sdk/go/slogx/slogx.go)\\n\\n## Install\\n\\n```bash\\ngo get github.com/binhonglee/slogx\\n```\\n\\n## API\\n\\n```go\\ntype Config struct {\\n    IsDev       bool\\n    Port        int\\n    ServiceName string\\n    CIMode      *bool\\n    LogFilePath string\\n    MaxEntries  int\\n}\\n\\nfunc Init(config Config)\\nfunc Debug(args ...interface{})\\nfunc Info(args ...interface{})\\nfunc Warn(args ...interface{})\\nfunc Error(args ...interface{})\\n```\\n\\n## Example\\n\\n```go\\npackage main\\n\\nimport \\\"github.com/binhonglee/slogx\\\"\\n\\nfunc main() {\\n    slogx.Init(slogx.Config{IsDev: true, ServiceName: \\\"api\\\", Port: 8080})\\n    slogx.Info(\\\"request completed\\\", map[string]interface{}{\\\"status\\\": 200})\\n}\\n```\\n\",\n  \"metadata\": {\n    \"title\": \"Go SDK\",\n    \"sidebar_position\": 4\n  }\n}"
+    }
+  ]
+}

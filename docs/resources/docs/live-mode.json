@@ -1,0 +1,13 @@
+{
+  "contents": [
+    {
+      "uri": "docs://docs/live-mode",
+      "mimeType": "text/markdown",
+      "text": "Live mode is the default development path. The SDK opens a WebSocket endpoint and broadcasts each log entry.\n\n## Typical flow\n\n1. Your service calls `init(...)` with `isDev: true`.\n2. SDK starts a WebSocket server (`port` default: `8080`).\n3. Open the live viewer at [https://binhonglee.github.io/slogx/app](https://binhonglee.github.io/slogx/app).\n4. Connect to `localhost:<port>` and inspect logs in real time.\n\n## Example\n\n```js\nslogx.init({\n  isDev: true,\n  port: 8080,\n  serviceName: 'my-service',\n  ciMode: false,\n});\n\nslogx.debug('cache miss', { key: 'user:42' });\nslogx.error('query failed', new Error('timeout'));\n```\n\n## Notes\n\n- `isDev` is a safety gate to avoid accidental production use.\n- If `ciMode` is `true`, WebSocket mode is bypassed.\n- If no client is connected, logs still go through call-site processing but are not shown in the viewer.\n",
+      "metadata": {
+        "title": "Live Mode",
+        "sidebar_position": 3
+      }
+    }
+  ]
+}

@@ -1,0 +1,121 @@
+{
+  "protocolVersion": "2024-11-05",
+  "serverInfo": {
+    "name": "slogx docs",
+    "version": "1.0.0"
+  },
+  "capabilities": {
+    "resources": [
+      {
+        "uri": "docs://docs/integrations/github-action",
+        "name": "GitHub Action",
+        "description": "docs content: GitHub Action",
+        "mimeType": "text/markdown"
+      },
+      {
+        "uri": "docs://docs/intro",
+        "name": "Overview",
+        "description": "Structured logging you can actually search. Stream logs live during development or replay CI logs later.",
+        "mimeType": "text/markdown"
+      },
+      {
+        "uri": "docs://docs/live-mode",
+        "name": "Live Mode",
+        "description": "docs content: Live Mode",
+        "mimeType": "text/markdown"
+      },
+      {
+        "uri": "docs://docs/mcp/overview",
+        "name": "MCP Overview",
+        "description": "docs content: MCP Overview",
+        "mimeType": "text/markdown"
+      },
+      {
+        "uri": "docs://docs/mcp/setup",
+        "name": "MCP Setup",
+        "description": "docs content: MCP Setup",
+        "mimeType": "text/markdown"
+      },
+      {
+        "uri": "docs://docs/mcp/tools",
+        "name": "MCP Tool Reference",
+        "description": "docs content: MCP Tool Reference",
+        "mimeType": "text/markdown"
+      },
+      {
+        "uri": "docs://docs/message-format",
+        "name": "Message Format",
+        "description": "docs content: Message Format",
+        "mimeType": "text/markdown"
+      },
+      {
+        "uri": "docs://docs/quickstart",
+        "name": "Quickstart",
+        "description": "docs content: Quickstart",
+        "mimeType": "text/markdown"
+      },
+      {
+        "uri": "docs://docs/replay-ci",
+        "name": "Replay Mode (CI)",
+        "description": "docs content: Replay Mode (CI)",
+        "mimeType": "text/markdown"
+      },
+      {
+        "uri": "docs://docs/sdks/go",
+        "name": "Go SDK",
+        "description": "docs content: Go SDK",
+        "mimeType": "text/markdown"
+      },
+      {
+        "uri": "docs://docs/sdks/overview",
+        "name": "SDK Overview",
+        "description": "docs content: SDK Overview",
+        "mimeType": "text/markdown"
+      },
+      {
+        "uri": "docs://docs/sdks/python",
+        "name": "Python SDK",
+        "description": "docs content: Python SDK",
+        "mimeType": "text/markdown"
+      },
+      {
+        "uri": "docs://docs/sdks/rust",
+        "name": "Rust SDK",
+        "description": "docs content: Rust SDK",
+        "mimeType": "text/markdown"
+      },
+      {
+        "uri": "docs://docs/sdks/typescript",
+        "name": "TypeScript SDK",
+        "description": "docs content: TypeScript SDK",
+        "mimeType": "text/markdown"
+      }
+    ],
+    "tools": [
+      {
+        "name": "list_resources",
+        "description": "List all available resource URIs that can be used with get_resource",
+        "inputSchema": {
+          "type": "object",
+          "properties": {}
+        }
+      },
+      {
+        "name": "get_resource",
+        "description": "Get the content of a specific resource by URI",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "uri": {
+              "type": "string",
+              "description": "URI of the resource to retrieve"
+            }
+          },
+          "required": [
+            "uri"
+          ]
+        }
+      }
+    ]
+  }
+}

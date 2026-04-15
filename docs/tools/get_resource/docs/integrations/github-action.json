@@ -1,0 +1,8 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"uri\": \"docs://docs/integrations/github-action\",\n  \"name\": \"GitHub Action\",\n  \"description\": \"docs content: GitHub Action\",\n  \"mimeType\": \"text/markdown\",\n  \"content\": \"Use the replay action to publish CI NDJSON logs and comment replay links on pull requests.\\n\\n```yaml\\npermissions:\\n  contents: write\\n  pull-requests: write\\n\\nsteps:\\n  - uses: actions/checkout@v4\\n\\n  - name: Run tests (your app logs with ciMode enabled)\\n    run: npm test\\n\\n  - name: Publish slogx replay\\n    uses: binhonglee/slogx/replay@main\\n    with:\\n      log_paths: ./slogx_logs/*.ndjson\\n      github_token: ${{ secrets.GITHUB_TOKEN }}\\n```\\n\\n## Inputs\\n\\n| Input | Required | Default | Description |\\n| --- | --- | --- | --- |\\n| `log_paths` | Yes | - | Comma/newline-separated NDJSON files |\\n| `github_token` | Yes | - | Token with `contents:write` and `pull-requests:write` |\\n| `replay_base_url` | No | [https://binhonglee.github.io/slogx/replay](https://binhonglee.github.io/slogx/replay) | Replay page base URL |\\n| `artifact_branch` | No | `slogx-artifacts` | Branch where NDJSON files are stored |\\n| `max_runs` | No | `500` | Max CI run IDs to keep |\\n\\nSource: [replay/action.yml](https://github.com/binhonglee/slogx/blob/main/replay/action.yml)\\n\",\n  \"metadata\": {\n    \"title\": \"GitHub Action\",\n    \"sidebar_position\": 6\n  }\n}"
+    }
+  ]
+}

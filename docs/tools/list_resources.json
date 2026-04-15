@@ -1,0 +1,8 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "[\n  \"docs/integrations/github-action\",\n  \"docs/intro\",\n  \"docs/live-mode\",\n  \"docs/mcp/overview\",\n  \"docs/mcp/setup\",\n  \"docs/mcp/tools\",\n  \"docs/message-format\",\n  \"docs/quickstart\",\n  \"docs/replay-ci\",\n  \"docs/sdks/go\",\n  \"docs/sdks/overview\",\n  \"docs/sdks/python\",\n  \"docs/sdks/rust\",\n  \"docs/sdks/typescript\"\n]"
+    }
+  ]
+}

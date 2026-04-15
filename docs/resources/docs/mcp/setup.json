@@ -1,0 +1,13 @@
+{
+  "contents": [
+    {
+      "uri": "docs://docs/mcp/setup",
+      "mimeType": "text/markdown",
+      "text": "Source: [mcp/README.md](https://github.com/binhonglee/slogx/blob/main/mcp/README.md)\n\n## Register in MCP client\n\nExample MCP client config:\n\n```json\n{\n  \"mcpServers\": {\n    \"slogx\": {\n      \"command\": \"npx\",\n      \"args\": [\"@binhonglee/slogx-mcp\"]\n    }\n  }\n}\n```\n\n## Start producing logs\n\nInitialize any slogx SDK in live mode (example in TypeScript):\n\n```ts\nawait slogx.init({\n  isDev: true,\n  serviceName: 'api',\n  port: 8080,\n});\n```\n\nThen connect from MCP using `ws://localhost:8080` (or your configured port).\n",
+      "metadata": {
+        "title": "MCP Setup",
+        "sidebar_position": 2
+      }
+    }
+  ]
+}

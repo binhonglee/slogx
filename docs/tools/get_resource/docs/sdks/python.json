@@ -1,0 +1,8 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"uri\": \"docs://docs/sdks/python\",\n  \"name\": \"Python SDK\",\n  \"description\": \"docs content: Python SDK\",\n  \"mimeType\": \"text/markdown\",\n  \"content\": \"Source: [`sdk/python/slogx.py`](https://github.com/binhonglee/slogx/blob/main/sdk/python/slogx.py)\\n\\n## Install\\n\\n```bash\\npip install slogx\\n```\\n\\n## API\\n\\n```py\\nslogx.init(\\n    is_dev: bool,\\n    port: int = 8080,\\n    service_name: str = 'python-service',\\n    ci_mode: Optional[bool] = None,\\n    log_file_path: Optional[str] = None,\\n    max_entries: int = 10000,\\n) -> None\\n\\nslogx.close() -> None\\nslogx.debug(*args: Any) -> None\\nslogx.info(*args: Any) -> None\\nslogx.warn(*args: Any) -> None\\nslogx.error(*args: Any) -> None\\n```\\n\\n## Example\\n\\n```py\\nfrom slogx import slogx\\n\\nslogx.init(is_dev=True, service_name='api', port=8080)\\nslogx.info('request completed', {'status': 200})\\n```\\n\",\n  \"metadata\": {\n    \"title\": \"Python SDK\",\n    \"sidebar_position\": 3\n  }\n}"
+    }
+  ]
+}

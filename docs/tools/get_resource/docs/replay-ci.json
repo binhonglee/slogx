@@ -1,0 +1,8 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"uri\": \"docs://docs/replay-ci\",\n  \"name\": \"Replay Mode (CI)\",\n  \"description\": \"docs content: Replay Mode (CI)\",\n  \"mimeType\": \"text/markdown\",\n  \"content\": \"Replay mode writes logs to NDJSON so runs can be inspected later.\\n\\n## How it works\\n\\n1. SDK detects CI (`CI`, `GITHUB_ACTIONS`, etc.) or you force `ciMode: true`.\\n2. Logs are appended to `./slogx_logs/<service>.ndjson` (default path).\\n3. Upload/publish the NDJSON artifact.\\n4. Load file or URL in [https://binhonglee.github.io/slogx/replay](https://binhonglee.github.io/slogx/replay).\\n\\n## Example config\\n\\n```js\\nslogx.init({\\n  isDev: true,\\n  serviceName: 'api',\\n  ciMode: true,\\n  logFilePath: './slogx_logs/api.ndjson',\\n  maxEntries: 10000,\\n});\\n```\\n\\n## Replay viewer inputs\\n\\n- drag-and-drop local `.ndjson`\\n- paste a direct URL to NDJSON\\n- use the built-in **Try Demo CI Logs** button\\n\",\n  \"metadata\": {\n    \"title\": \"Replay Mode (CI)\",\n    \"sidebar_position\": 4\n  }\n}"
+    }
+  ]
+}
