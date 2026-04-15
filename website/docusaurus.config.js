@@ -3,7 +3,7 @@ const { themes: prismThemes } = require('prism-react-renderer');
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'slogx docs',
-  tagline: 'Structured logs for local and CI workflows',
+  tagline: 'Structured logging you can actually search',
   favicon: 'img/icon.png',
   url: 'https://binhonglee.github.io',
   baseUrl: '/slogx/docs/',

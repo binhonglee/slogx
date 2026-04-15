@@ -27,6 +27,9 @@ jobs:
       - name: Build docs
         run: npm run docs:build
 
+      - name: Generate StaticMCP
+        run: npm run docs:smg
+
       - name: Build
         run: npm run build
 

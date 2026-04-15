@@ -1,10 +1,12 @@
 ![](public/assets/full_logo.png)
 
-# slogx — good ol' print debugging, but better
+# slogx — structured logging you can actually search
 
-slogx is a structured logging toolkit for backend developers. One SDK gives you two ways to view logs: stream them live to a browser UI during local development, or write them to a file during CI and replay them later. Same logging calls, different outputs depending on the environment.
+slogx is structured logging with a browser UI. One SDK gives you two ways to view logs: stream them live during local development, or write them to a file during CI and replay them later. Same logging calls, different outputs depending on the environment.
 
-Docs site: [https://binhonglee.github.io/slogx/docs](https://binhonglee.github.io/slogx/docs)  
+**Key features**: Search and filter logs in real time. Drill into JSON payloads and stack traces. Replay CI logs with a link in your PR. Optionally, let your AI assistant query logs directly via MCP.
+
+Docs: [https://binhonglee.github.io/slogx/docs](https://binhonglee.github.io/slogx/docs)
 SDK reference: [https://binhonglee.github.io/slogx/docs/sdks](https://binhonglee.github.io/slogx/docs/sdks)
 
 https://github.com/user-attachments/assets/616ddfb8-20f5-48fe-be58-0dd64e3a0fa3
