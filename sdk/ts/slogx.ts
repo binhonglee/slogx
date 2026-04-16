@@ -1,6 +1,21 @@
 import { WebSocketServer, WebSocket } from 'ws';
 import { CIWriter } from './ciWriter';
 
+// Install source-map-support only if the runtime doesn't already handle source maps.
+// Runtimes like tsx, ts-node, and vitest have built-in source map support.
+// We detect this by checking if a simple stack trace already shows .ts files.
+(function installSourceMapSupportIfNeeded() {
+  const stack = new Error().stack || '';
+  const hasTypescriptInStack = /\.ts:\d+:\d+/.test(stack);
+  if (!hasTypescriptInStack) {
+    try {
+      require('source-map-support/register');
+    } catch {
+      // source-map-support not available, skip
+    }
+  }
+})();
+
 // Types matching the frontend
 enum LogLevel {
   DEBUG = 'DEBUG',
