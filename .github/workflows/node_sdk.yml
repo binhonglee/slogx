@@ -28,11 +28,11 @@ jobs:
       - name: Install npm
         run: npm i
 
-      - name: Run unit tests
-        run: npm run test
-
       - name: Type check
         run: npx tsc --noEmit
 
       - name: Build application
         run: npm run build
+
+      - name: Run unit tests
+        run: npm run test
