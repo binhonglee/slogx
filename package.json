@@ -22,9 +22,9 @@
     "ws": "8.18.1"
   },
   "devDependencies": {
-    "@docusaurus/core": "3.8.1",
-    "@docusaurus/faster": "3.8.1",
-    "@docusaurus/preset-classic": "3.8.1",
+    "@docusaurus/core": "3.10.0",
+    "@docusaurus/faster": "3.10.0",
+    "@docusaurus/preset-classic": "3.10.0",
     "@playwright/test": "1.59.1",
     "@preact/preset-vite": "2.10.2",
     "@testing-library/preact": "3.2.4",
