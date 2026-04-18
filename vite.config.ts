@@ -31,6 +31,13 @@ export default defineConfig({
         '**/*.spec.ts',
       ]
     },
-    include: ['components/*.test.{ts,tsx}', 'hooks/*.test.{ts,tsx}', 'services/*.test.{ts,tsx}'],
+    include: ['components/*.test.{ts,tsx}', 'hooks/*.test.{ts,tsx}', 'services/*.test.{ts,tsx}', 'tests/integration/**/*.test.{ts,tsx}'],
+    setupFiles: ['./tests/setup.ts'],
+    pool: 'forks',
+    poolOptions: {
+      forks: {
+        singleFork: true,
+      },
+    },
   }
 });
