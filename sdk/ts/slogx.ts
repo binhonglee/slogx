@@ -1,20 +1,24 @@
 import { WebSocketServer, WebSocket } from 'ws';
 import { CIWriter } from './ciWriter';
 
+/**
+ * Check if the current runtime already provides source map support.
+ * Runtimes like tsx, ts-node, and vitest have built-in source map support.
+ * We detect this by checking if a stack trace shows .ts files.
+ */
+export function runtimeHasSourceMaps(stack: string = new Error().stack || ''): boolean {
+  return /\.ts:\d+:\d+/.test(stack);
+}
+
 // Install source-map-support only if the runtime doesn't already handle source maps.
-// Runtimes like tsx, ts-node, and vitest have built-in source map support.
-// We detect this by checking if a simple stack trace already shows .ts files.
-(function installSourceMapSupportIfNeeded() {
-  const stack = new Error().stack || '';
-  const hasTypescriptInStack = /\.ts:\d+:\d+/.test(stack);
-  if (!hasTypescriptInStack) {
-    try {
-      require('source-map-support/register');
-    } catch {
-      // source-map-support not available, skip
-    }
+/* istanbul ignore next -- @preserve runtime-specific, tested via integration tests */
+if (!runtimeHasSourceMaps()) {
+  try {
+    require('source-map-support/register');
+  } catch {
+    // source-map-support not available, skip
   }
-})();
+}
 
 // Types matching the frontend
 enum LogLevel {
