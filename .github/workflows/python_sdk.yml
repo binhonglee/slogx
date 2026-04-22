@@ -34,3 +34,35 @@ jobs:
 
       - name: Run tests
         run: pytest -q
+
+      - name: Build package
+        run: |
+          pip install build
+          python -m build
+
+      - name: Verify package contents
+        run: |
+          # Check that slogx.py is included in the wheel
+          python << 'EOF'
+          import glob
+          import zipfile
+          import sys
+
+          wheels = glob.glob('dist/*.whl')
+          if not wheels:
+              print('ERROR: No wheel found in dist/')
+              sys.exit(1)
+
+          with zipfile.ZipFile(wheels[0]) as z:
+              files = z.namelist()
+              if 'slogx.py' not in files:
+                  print('ERROR: slogx.py not found in wheel!')
+                  print('Wheel contents:', files)
+                  sys.exit(1)
+              print('Package contents verified: slogx.py found')
+          EOF
+
+      - name: Test package install
+        run: |
+          pip install dist/*.whl
+          python -c "import slogx; print('Import successful')"
