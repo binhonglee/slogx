@@ -320,7 +320,11 @@ impl SlogX {
         let mut disconnected = Vec::new();
 
         for (id, sender) in state.clients.iter_mut() {
-            if sender.send(Message::Text(payload.clone())).await.is_err() {
+            if sender
+                .send(Message::Text(payload.clone().into()))
+                .await
+                .is_err()
+            {
                 disconnected.push(*id);
             }
         }
