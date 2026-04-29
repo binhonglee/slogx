@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/preact';
 import SetupModal from './SetupModal';
 
@@ -32,5 +32,39 @@ describe('SetupModal', () => {
     const goTab = screen.getByText('Go');
     fireEvent.click(goTab);
     expect(screen.getByText(/"github.com\/binhonglee\/slogx"/)).toBeDefined();
+  });
+
+  it('switches to Rust tab and displays Rust code', () => {
+    render(<SetupModal isOpen={true} onClose={() => {}} />);
+
+    const rustTab = screen.getByText('Rust');
+    fireEvent.click(rustTab);
+    expect(screen.getByText(/cargo add slogx/)).toBeDefined();
+    expect(screen.getByText(/slogx::init/)).toBeDefined();
+  });
+
+  it('calls onClose when close button is clicked', () => {
+    const onClose = vi.fn();
+    const { container } = render(<SetupModal isOpen={true} onClose={onClose} />);
+
+    const closeBtn = container.querySelector('.modal-close');
+    if (closeBtn) fireEvent.click(closeBtn);
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('copies code to clipboard when copy button is clicked', async () => {
+    const writeTextMock = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, {
+      clipboard: { writeText: writeTextMock },
+    });
+
+    const { container } = render(<SetupModal isOpen={true} onClose={() => {}} />);
+
+    const copyBtn = container.querySelector('.copy-btn');
+    if (copyBtn) fireEvent.click(copyBtn);
+
+    expect(writeTextMock).toHaveBeenCalled();
+    // The copied text should contain the node snippet (default tab)
+    expect(writeTextMock.mock.calls[0][0]).toContain("import { slogx } from 'slogx'");
   });
 });

@@ -56,4 +56,28 @@ describe('LogDetailsPanel', () => {
     if (closeBtn) fireEvent.click(closeBtn);
     expect(onClose).toHaveBeenCalled();
   });
+
+  it('renders log without optional metadata fields', () => {
+    const log = createLogEntry({
+      id: 'minimal-1',
+      timestamp: '2024-01-15T10:30:45.123Z',
+      level: LogLevel.WARN,
+      args: ['simple message'],
+      metadata: { lang: 'python' as const, service: 'default' }
+    });
+    const { container } = render(<LogDetailsPanel log={log} onClose={() => {}} />);
+    expect(screen.getByText('WARN')).toBeDefined();
+    // No file/line should show N/A
+    expect(container.textContent).toContain('N/A');
+  });
+
+  it('renders object-type args with JsonViewer', () => {
+    const log = createLogEntry({
+      ...testLogOverrides,
+      args: [{ myKey: 'myValue' }],
+    });
+    const { container } = render(<LogDetailsPanel log={log} onClose={() => {}} />);
+    // JsonViewer renders expanded at first level
+    expect(container.textContent).toContain('myKey');
+  });
 });

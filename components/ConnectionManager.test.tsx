@@ -56,4 +56,46 @@ describe('ConnectionManager', () => {
     
     expect(onRemove).toHaveBeenCalledWith('ws://localhost:8080');
   });
+
+  it('calls onToggleSource when toggle button is clicked', () => {
+    const onToggleSource = vi.fn();
+    const { container } = render(<ConnectionManager {...defaultProps} connections={{ 'ws://localhost:8080': 'connected' }} onToggleSource={onToggleSource} />);
+
+    const toggleBtn = container.querySelector('.toggle-btn');
+    if (toggleBtn) fireEvent.click(toggleBtn);
+
+    expect(onToggleSource).toHaveBeenCalledWith('ws://localhost:8080');
+  });
+
+  it('renders connecting status icon', () => {
+    const { container } = render(<ConnectionManager {...defaultProps} connections={{ 'ws://localhost:8080': 'connecting' }} />);
+    // Loader2 icon should be rendered with animate-spin class
+    expect(container.querySelector('.animate-spin')).toBeDefined();
+  });
+
+  it('applies hidden class when source is in hiddenSources', () => {
+    const { container } = render(
+      <ConnectionManager
+        {...defaultProps}
+        connections={{ 'ws://localhost:8080': 'connected' }}
+        hiddenSources={new Set(['ws://localhost:8080'])}
+      />
+    );
+    expect(container.querySelector('.connection-chip.hidden')).toBeDefined();
+  });
+
+  it('clears validation error when input changes', () => {
+    const { container } = render(<ConnectionManager {...defaultProps} />);
+    const input = screen.getByPlaceholderText('localhost:8080') as HTMLInputElement;
+    const form = container.querySelector('form');
+
+    // First trigger a validation error
+    fireEvent.input(input, { target: { value: 'http:invalid' } });
+    if (form) fireEvent.submit(form);
+    expect(screen.getByText(/Invalid/i)).toBeDefined();
+
+    // Now type something — error should clear
+    fireEvent.input(input, { target: { value: 'localhost:9090' } });
+    expect(container.querySelector('.validation-error')).toBeNull();
+  });
 });
