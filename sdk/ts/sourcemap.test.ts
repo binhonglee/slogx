@@ -216,13 +216,40 @@ describe('Source Map Support', () => {
     });
   });
 
-  describe('detection logic', () => {
-    it('should detect .ts in stack trace correctly', () => {
+  describe('runtimeHasSourceMaps detection', () => {
+    it('should return true for stack traces with .ts files', async () => {
+      const { runtimeHasSourceMaps } = await import('./slogx');
       const tsStack = 'Error\n    at test (/path/to/file.ts:10:5)';
-      const jsStack = 'Error\n    at test (/path/to/file.js:10:5)';
+      expect(runtimeHasSourceMaps(tsStack)).toBe(true);
+    });
 
-      expect(/\.ts:\d+:\d+/.test(tsStack)).toBe(true);
-      expect(/\.ts:\d+:\d+/.test(jsStack)).toBe(false);
+    it('should return false for stack traces with only .js files', async () => {
+      const { runtimeHasSourceMaps } = await import('./slogx');
+      const jsStack = 'Error\n    at test (/path/to/file.js:10:5)';
+      expect(runtimeHasSourceMaps(jsStack)).toBe(false);
+    });
+
+    it('should return false for empty stack traces', async () => {
+      const { runtimeHasSourceMaps } = await import('./slogx');
+      expect(runtimeHasSourceMaps('')).toBe(false);
+    });
+
+    it('should handle mixed .ts and .js in stack trace', async () => {
+      const { runtimeHasSourceMaps } = await import('./slogx');
+      const mixedStack = 'Error\n    at test (/path/file.js:5:1)\n    at other (/path/file.ts:10:5)';
+      expect(runtimeHasSourceMaps(mixedStack)).toBe(true);
+    });
+
+    it('should not match .ts without line numbers', async () => {
+      const { runtimeHasSourceMaps } = await import('./slogx');
+      const invalidStack = 'Error\n    at test (/path/to/file.ts)';
+      expect(runtimeHasSourceMaps(invalidStack)).toBe(false);
+    });
+
+    it('should return true when called without arguments in tsx/vitest', async () => {
+      const { runtimeHasSourceMaps } = await import('./slogx');
+      // In vitest/tsx, the default stack will have .ts files
+      expect(runtimeHasSourceMaps()).toBe(true);
     });
   });
 });

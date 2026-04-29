@@ -14,7 +14,9 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "SLOGX_PYTHON=\"./.venv/bin/python\" playwright test",
-    "test:e2e:ui": "SLOGX_PYTHON=\"./.venv/bin/python\" playwright test --ui"
+    "test:e2e:ui": "SLOGX_PYTHON=\"./.venv/bin/python\" playwright test --ui",
+    "test:integration": "vitest run tests/integration",
+    "test:all": "npm run test && npm run test:integration && npm run test:e2e"
   },
   "dependencies": {
     "lucide-preact": "1.11.0",
