@@ -21,7 +21,7 @@
   "dependencies": {
     "lucide-preact": "1.14.0",
     "preact": "10.29.1",
-    "ws": "8.20.0"
+    "ws": "8.20.1"
   },
   "devDependencies": {
     "@docusaurus/core": "3.10.1",
