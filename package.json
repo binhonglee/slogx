@@ -30,7 +30,7 @@
     "@playwright/test": "1.60.0",
     "@preact/preset-vite": "2.10.5",
     "@testing-library/preact": "3.2.4",
-    "@types/node": "25.8.0",
+    "@types/node": "25.9.0",
     "@types/ws": "8.18.1",
     "@vitest/coverage-v8": "4.1.6",
     "docusaurus-smg": "0.0.4",
