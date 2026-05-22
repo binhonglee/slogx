@@ -28,7 +28,7 @@
     "@types/ws": "8.18.1",
     "tsx": "4.22.0",
     "typescript": "6.0.3",
-    "vitest": "4.1.6"
+    "vitest": "4.1.7"
   },
   "repository": {
     "url": "https://github.com/binhonglee/slogx"
