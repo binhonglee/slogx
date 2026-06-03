@@ -36,7 +36,7 @@
     "docusaurus-smg": "0.0.4",
     "jsdom": "29.1.1",
     "typescript": "6.0.3",
-    "vite": "8.0.15",
+    "vite": "8.0.16",
     "vitest": "4.1.7"
   }
 }
