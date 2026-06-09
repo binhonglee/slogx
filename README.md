@@ -4,7 +4,7 @@
 
 slogx is structured logging with a browser UI. One SDK gives you two ways to view logs: stream them live during local development, or write them to a file during CI and replay them later. Same logging calls, different outputs depending on the environment.
 
-**Key features**: Search and filter logs in real time. Drill into JSON payloads and stack traces. Replay CI logs with a link in your PR. Optionally, let your AI assistant query logs directly via MCP.
+**Key features**: Search and filter logs in real time. Drill into JSON payloads and stack traces. Replay CI logs with a link in your PR. Optionally, let your AI assistant query logs directly via MCP — plus an installable [skill](.claude/skills/slogx/INSTALL.md) that teaches Claude Code, Codex, and Cursor the efficient debugging workflow.
 
 Docs: [https://binhonglee.github.io/slogx/docs](https://binhonglee.github.io/slogx/docs)
 SDK reference: [https://binhonglee.github.io/slogx/docs/sdks](https://binhonglee.github.io/slogx/docs/sdks)

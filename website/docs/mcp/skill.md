@@ -1,0 +1,30 @@
+---
+title: MCP Skill
+sidebar_position: 4
+---
+
+The slogx **skill** is a companion to the MCP server. The MCP exposes tools; the skill teaches your AI coding agent *when and how* to use them — connect first, prefer `slogx_search` over `slogx_get_logs`, drill into `slogx_get_details` only when you've narrowed to a specific log.
+
+## Why a skill on top of an MCP?
+
+The MCP tool descriptions cover what each tool does, but real debugging is a workflow: connect, scan, search, drill. Without that workflow as context, agents tend to call `slogx_get_logs` with large limits — flooding their own context window. The skill encodes the efficient sequence so the agent gets it right by default.
+
+## Format
+
+`SKILL.md` with YAML frontmatter — the open Agent Skills standard. The same file works in Claude Code, Codex CLI, and Cursor (Cursor reads from both `.claude/skills/` and `.codex/skills/`).
+
+## Install
+
+The skill ships in this repo at [`.claude/skills/slogx/SKILL.md`](https://github.com/binhonglee/slogx/blob/main/.claude/skills/slogx/SKILL.md). You don't need to clone the repo to use it — a one-liner pulls just the skill into the right paths for your tools:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/binhonglee/slogx/main/scripts/install-skill.sh | bash
+```
+
+That writes to `~/.claude/skills/slogx/` and `~/.codex/skills/slogx/` (Cursor reads from either).
+
+For project scope, pinning to a release, or single-tool installs, see [`INSTALL.md`](https://github.com/binhonglee/slogx/blob/main/.claude/skills/slogx/INSTALL.md).
+
+## Prerequisites
+
+The skill calls into the slogx MCP tools, so the MCP server has to be installed and registered in your agent's MCP client first — see [Setup](./setup).
