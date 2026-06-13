@@ -9,6 +9,11 @@ The slogx **skill** is a companion to the MCP server. The MCP exposes tools; the
 
 The MCP tool descriptions cover what each tool does, but real debugging is a workflow: connect, scan, search, drill. Without that workflow as context, agents tend to call `slogx_get_logs` with large limits — flooding their own context window. The skill encodes the efficient sequence so the agent gets it right by default.
 
+It also handles two ergonomics wins:
+
+- **Discovers the port from your code** instead of asking. The skill tells the agent to grep for the slogx init call in the user's language (`slogx.init(` / `slogx.Init(` / `slogx::init(`) and read the port from there.
+- **Bootstraps the MCP install if it's missing.** If the `slogx_*` tools aren't registered, the skill ships per-tool registration steps (Claude Code, Codex CLI, Cursor) so the agent can walk you through getting the MCP set up.
+
 ## Format
 
 `SKILL.md` with YAML frontmatter — the open Agent Skills standard. The same file works in Claude Code, Codex CLI, and Cursor (Cursor reads from both `.claude/skills/` and `.codex/skills/`).

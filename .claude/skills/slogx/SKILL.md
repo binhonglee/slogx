@@ -7,9 +7,26 @@ description: Read live backend logs over WebSocket via the slogx MCP server. Tri
 
 slogx streams structured logs from a running backend over a WebSocket. This skill teaches the connect-then-query workflow on top of the `slogx_*` MCP tools.
 
-## Connect first, query second
+## If the MCP isn't installed
 
-Before any log query, call `slogx_list`. If nothing is connected, ask the user for their WebSocket URL (usually `ws://localhost:<port>`) and call `slogx_connect`. The MCP holds a 500-entry ring buffer **per connection** — only logs received *after* connect are visible. Older logs are gone.
+If the `slogx_*` tools aren't available (the agent reports an unknown tool when you call `slogx_list`), the slogx MCP server isn't registered with the agent yet. See [`INSTALL_MCP.md`](./INSTALL_MCP.md) for per-tool registration steps (Claude Code, Codex CLI, Cursor). Offer to install it for the user.
+
+## Connect: discover the port from the codebase
+
+Before any log query, call `slogx_list`. If nothing is connected, **find the port by grepping the codebase** rather than asking the user — the slogx SDK init call holds it. Per language:
+
+- **TS/JS** — grep `slogx.init(` → port is the `port:` value in the config object.
+- **Python** — grep `slogx.init(` → port is `port=<num>`.
+- **Go** — grep `slogx.Init(` → port is `Port: <num>` inside the `slogx.Config{...}`.
+- **Rust** — grep `slogx::init(` → port is the second positional argument.
+
+Then call `slogx_connect("ws://localhost:<port>")`.
+
+Only ask the user if:
+- no init call exists in the codebase, OR
+- the port is dynamic (env var, config file, CLI flag) and you can't resolve it.
+
+The MCP holds a 500-entry ring buffer **per connection** — only logs received *after* connect are visible. Older logs are gone.
 
 ## Prefer search over dump
 
@@ -26,7 +43,7 @@ Search/get returns one-line summaries with IDs. Call `slogx_get_details <id>` fo
 ## Common workflows
 
 **"My API is returning 500s"**
-1. `slogx_list` — confirm connection or prompt for URL
+1. `slogx_list` — confirm connection, else discover port and `slogx_connect`
 2. `slogx_get_errors` — scan recent errors
 3. `slogx_get_details <id>` on the relevant one
 4. Read stacktrace, point to `file:line`

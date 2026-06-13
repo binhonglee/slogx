@@ -56,17 +56,18 @@ If you'd rather not pipe a script into bash:
 DEST=~/.claude/skills/slogx   # or ~/.codex/skills/slogx
 
 mkdir -p "$DEST"
-curl -fsSL -o "$DEST/SKILL.md" \
-  https://raw.githubusercontent.com/binhonglee/slogx/main/.claude/skills/slogx/SKILL.md
+BASE=https://raw.githubusercontent.com/binhonglee/slogx/main/.claude/skills/slogx
+curl -fsSL -o "$DEST/SKILL.md"        "$BASE/SKILL.md"
+curl -fsSL -o "$DEST/INSTALL_MCP.md"  "$BASE/INSTALL_MCP.md"
 ```
 
-The source path in the repo is `.claude/skills/slogx/SKILL.md` regardless of which tool you're installing into — the SKILL.md content is tool-agnostic.
+The source paths in the repo (`.claude/skills/slogx/SKILL.md` and `INSTALL_MCP.md`) are the same regardless of which agent you're installing into — both files are tool-agnostic.
 
 ## Verifying
 
 ```bash
 ls ~/.claude/skills/slogx   # or ~/.codex/skills/slogx
-# SKILL.md
+# SKILL.md  INSTALL_MCP.md
 ```
 
 In your agent, ask a debug question that mentions logs or your service — the skill should activate based on its `description` frontmatter.
@@ -83,4 +84,4 @@ rm -rf ~/.claude/skills/slogx ~/.codex/skills/slogx
 
 ## Prerequisites
 
-The skill calls into the slogx MCP server's tools (`slogx_connect`, `slogx_search`, etc.) — install and configure that separately for your tool. See [`mcp/README.md`](../../../mcp/README.md).
+The skill calls into the slogx MCP server's tools (`slogx_connect`, `slogx_search`, etc.). If you haven't registered the MCP server with your agent yet, the skill itself includes per-tool registration steps in [`INSTALL_MCP.md`](./INSTALL_MCP.md) — the agent can read that file and walk you through the install. The MCP source lives in [`mcp/README.md`](../../../mcp/README.md).

@@ -74,7 +74,7 @@ else
 fi
 
 BASE="https://raw.githubusercontent.com/${REPO}/${REF}/.claude/skills/slogx"
-FILES=("SKILL.md")
+FILES=("SKILL.md" "INSTALL_MCP.md")
 
 TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TMP_DIR"' EXIT
