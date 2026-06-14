@@ -68,3 +68,7 @@ The MCP server uses a compact log format to minimize token usage:
 - `slogx_search` / `slogx_get_logs` return one-line summaries
 - `slogx_get_details` returns full info only when needed
 - Buffer holds last 500 logs per connection
+
+## See also
+
+The companion **slogx skill** teaches AI coding agents the efficient workflow on top of these tools (connect first, prefer `slogx_search`, drill into details only when needed). It works in Claude Code, Codex CLI, and Cursor. Install with one curl line — see [`.claude/skills/slogx/INSTALL.md`](../.claude/skills/slogx/INSTALL.md).
