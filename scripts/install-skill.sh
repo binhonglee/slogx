@@ -27,12 +27,19 @@ Options:
 EOF
 }
 
+require_value() {
+  if [[ $# -lt 2 ]]; then
+    echo "Error: $1 requires a value" >&2
+    exit 1
+  fi
+}
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --tool) TOOL="$2"; shift 2 ;;
+    --tool) require_value "$@"; TOOL="$2"; shift 2 ;;
     --project) SCOPE="project"; shift ;;
-    --ref) REF="$2"; shift 2 ;;
-    --dest) DEST_OVERRIDE="$2"; shift 2 ;;
+    --ref) require_value "$@"; REF="$2"; shift 2 ;;
+    --dest) require_value "$@"; DEST_OVERRIDE="$2"; shift 2 ;;
     -h|--help) usage; exit 0 ;;
     *) echo "Unknown arg: $1" >&2; usage; exit 1 ;;
   esac
