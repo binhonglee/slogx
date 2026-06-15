@@ -45,10 +45,12 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-case "$TOOL" in
-  claude|codex|both) ;;
-  *) echo "Invalid --tool: $TOOL (expected claude|codex|both)" >&2; exit 1 ;;
-esac
+if [[ -z "$DEST_OVERRIDE" ]]; then
+  case "$TOOL" in
+    claude|codex|both) ;;
+    *) echo "Invalid --tool: $TOOL (expected claude|codex|both)" >&2; exit 1 ;;
+  esac
+fi
 
 if ! command -v curl >/dev/null 2>&1; then
   echo "Error: curl is required" >&2
@@ -61,6 +63,10 @@ dest_for() {
   if [[ "$SCOPE" == "project" ]]; then
     root="$(pwd)"
   else
+    if [[ -z "${HOME:-}" ]]; then
+      echo "Error: \$HOME is not set. Use --project (install under current dir) or --dest PATH." >&2
+      exit 1
+    fi
     root="$HOME"
   fi
   echo "${root}/.${tool}/skills/slogx"
