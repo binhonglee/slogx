@@ -37,6 +37,12 @@
         "mimeType": "text/markdown"
       },
       {
+        "uri": "docs://docs/mcp/skill",
+        "name": "MCP Skill",
+        "description": "docs content: MCP Skill",
+        "mimeType": "text/markdown"
+      },
+      {
         "uri": "docs://docs/mcp/tools",
         "name": "MCP Tool Reference",
         "description": "docs content: MCP Tool Reference",
