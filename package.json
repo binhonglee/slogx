@@ -19,7 +19,7 @@
     "test:all": "npm run test && npm run test:integration && npm run test:e2e"
   },
   "dependencies": {
-    "lucide-preact": "1.18.0",
+    "lucide-preact": "1.20.0",
     "preact": "10.29.2",
     "ws": "8.21.0"
   },
