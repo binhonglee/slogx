@@ -6,6 +6,7 @@ on:
   pull_request:
 jobs:
   test:
+    name: node_sdk
     runs-on: ubuntu-latest
     defaults:
       run:

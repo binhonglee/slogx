@@ -12,6 +12,7 @@ permissions:
 
 jobs:
   test:
+    name: test_slogx_replay
     runs-on: ubuntu-latest
 
     steps:
