@@ -27,7 +27,7 @@
     "@docusaurus/core": "3.10.2",
     "@docusaurus/faster": "3.10.2",
     "@docusaurus/preset-classic": "3.10.2",
-    "@playwright/test": "1.62.0",
+    "@playwright/test": "1.62.1",
     "@preact/preset-vite": "2.10.6",
     "@testing-library/preact": "3.2.4",
     "@types/node": "26.1.2",
