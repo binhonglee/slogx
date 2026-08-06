@@ -1,6 +1,6 @@
 {
   "name": "@binhonglee/slogx-mcp",
-  "version": "0.0.1",
+  "version": "0.0.4",
   "description": "MCP server for slogx - real-time log streaming for AI assistants",
   "main": "dist/index.js",
   "bin": {

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "slogx"
-version = "0.0.3"
+version = "0.0.4"
 description = "Real-time log streaming SDK for Python"
 readme = "README.md"
 license = "MIT"
