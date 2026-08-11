@@ -20,7 +20,7 @@
     "ws": "8.21.2"
   },
   "devDependencies": {
-    "@types/node": "26.1.2",
+    "@types/node": "26.2.0",
     "@types/ws": "8.18.1",
     "typescript": "7.0.2",
     "vitest": "4.1.10"
