@@ -32,11 +32,11 @@
     "@testing-library/preact": "3.2.4",
     "@types/node": "26.2.0",
     "@types/ws": "8.18.1",
-    "@vitest/coverage-v8": "4.1.10",
+    "@vitest/coverage-v8": "4.1.11",
     "docusaurus-smg": "0.0.4",
     "jsdom": "30.0.1",
     "typescript": "7.0.2",
     "vite": "8.2.1",
-    "vitest": "4.1.10"
+    "vitest": "4.1.11"
   }
 }
