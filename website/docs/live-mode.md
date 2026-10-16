@@ -29,5 +29,6 @@ slogx.error('query failed', new Error('timeout'));
 ## Notes
 
 - `isDev` is a safety gate to avoid accidental production use.
-- If `ciMode` is `true`, WebSocket mode is bypassed.
+- If `ciMode` is `true`, WebSocket mode is bypassed unless you also set `stream: true`, which writes to file and streams live at the same time.
+- Set `stream: false` to never start the WebSocket server.
 - If no client is connected, logs still go through call-site processing but are not shown in the viewer.

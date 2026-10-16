@@ -29,10 +29,13 @@ type Config struct {
 	IsDev       bool
 	Port        int
 	ServiceName string
-	// CIMode: undefined/nil (auto), true (force file), false (force ws)
+	// CIMode: undefined/nil (auto), true (force file), false (disable file)
 	CIMode      *bool
 	LogFilePath string
 	MaxEntries  int
+	// Stream: undefined/nil (stream only when file output is disabled), true (always start the
+	// WebSocket server; combine with CIMode to do both), false (never stream)
+	Stream *bool
 }
 
 // Detect if running in a CI environment
@@ -108,6 +111,11 @@ func Init(config Config) {
 		useCI = isCI()
 	}
 
+	useStream := !useCI
+	if config.Stream != nil {
+		useStream = *config.Stream
+	}
+
 	if useCI {
 		logPath := config.LogFilePath
 		if logPath == "" {
@@ -116,6 +124,9 @@ func Init(config Config) {
 
 		s.ciWriter = NewCIWriter(logPath, config.MaxEntries)
 		fmt.Printf("[slogx] 📝 CI mode: logging to %s\n", logPath)
+	}
+
+	if !useStream {
 		return
 	}
 
@@ -242,10 +253,13 @@ func log(level LogLevel, args ...interface{}) {
 	// CI Mode: Write to file
 	if s.ciWriter != nil {
 		s.ciWriter.Write(entry)
-		return
 	}
 
 	// WebSocket Mode: Broadcast
+	if !hasClients {
+		return
+	}
+
 	payload, err := json.Marshal(entry)
 	if err != nil {
 		return

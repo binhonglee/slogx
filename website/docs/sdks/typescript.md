@@ -21,6 +21,7 @@ interface SlogConfig {
   ciMode?: boolean;
   logFilePath?: string;
   maxEntries?: number;
+  stream?: boolean;
 }
 
 slogx.init(config: SlogConfig): Promise<void>;

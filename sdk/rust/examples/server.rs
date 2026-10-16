@@ -12,7 +12,7 @@ async fn main() {
 
     let ci_mode = if force_ci { Some(true) } else { None };
 
-    slogx::init_with_config(true, 8080, "rust-demo", ci_mode, None, None).await;
+    slogx::init_with_config(true, 8080, "rust-demo", ci_mode, None, None, None).await;
 
     println!("Sending demo logs every 2 seconds...");
     println!("Connect slogx viewer to ws://localhost:8080");

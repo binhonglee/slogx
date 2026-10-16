@@ -306,6 +306,60 @@ class TestCIMode:
 
         s.close()
 
+    def test_init_file_and_stream(self):
+        import asyncio
+        import socket
+        import time
+        from websockets.client import connect
+
+        with socket.socket() as sock:
+            sock.bind(('localhost', 0))
+            port = sock.getsockname()[1]
+
+        s = SlogX()
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            log_path = os.path.join(tmp_dir, 'logs', 'both.ndjson')
+            s.init(
+                is_dev=True,
+                port=port,
+                service_name='both-service',
+                ci_mode=True,
+                log_file_path=log_path,
+                stream=True
+            )
+
+            assert s._ci_writer is not None
+            assert s._loop is not None
+
+            async def receive_one():
+                async with connect(f'ws://localhost:{port}') as ws:
+                    while not s._clients:
+                        await asyncio.sleep(0.01)
+                    s.info('both')
+                    return json.loads(await asyncio.wait_for(ws.recv(), timeout=5))
+
+            streamed = asyncio.run(receive_one())
+            s._ci_writer.flush()
+
+            with open(log_path, 'r') as f:
+                lines = [line for line in f if line.strip()]
+
+            written = json.loads(lines[-1])
+            assert streamed['id'] == written['id']
+            assert streamed['args'] == ['both']
+
+        s.close()
+
+    def test_init_stream_disabled(self, monkeypatch):
+        for var in CI_ENV_VARS:
+            monkeypatch.delenv(var, raising=False)
+        s = SlogX()
+        s.init(is_dev=True, stream=False)
+        assert s._ci_writer is None
+        assert s._loop is None
+        s.info('nowhere')
+        s.close()
+
 
 if __name__ == '__main__':
     pytest.main([__file__, '-v'])

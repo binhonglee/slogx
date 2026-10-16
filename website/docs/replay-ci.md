@@ -24,6 +24,19 @@ slogx.init({
 });
 ```
 
+## File and live streaming together
+
+By default, enabling CI mode turns off the WebSocket server. Set `stream: true` to keep streaming live while also writing the NDJSON file, which is handy for watching a local run and keeping a replayable copy.
+
+```js
+slogx.init({
+  isDev: true,
+  serviceName: 'api',
+  ciMode: true,
+  stream: true,
+});
+```
+
 ## Replay viewer inputs
 
 - drag-and-drop local `.ndjson`
