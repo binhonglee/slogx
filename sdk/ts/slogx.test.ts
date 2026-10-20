@@ -432,4 +432,56 @@ describe('SlogX SDK', () => {
       expect(entry.args[0]).toBe('test log');
     });
   });
+
+  describe('File + stream mode', () => {
+    let CIWriterMock: any;
+
+    beforeEach(async () => {
+      vi.resetModules();
+      const ciWriterModule = await import('./ciWriter');
+      CIWriterMock = ciWriterModule.CIWriter;
+      const module = await import('./slogx');
+      slogx = module.slogx;
+      mockWss = (WebSocketServer as any).mockInstance;
+    });
+
+    it('enables both outputs with ciMode: true and stream: true', async () => {
+      await slogx.init({ isDev: true, ciMode: true, stream: true });
+      expect(WebSocketServer).toHaveBeenCalled();
+      expect(CIWriterMock).toHaveBeenCalled();
+    });
+
+    it('streams alongside auto-detected CI file output', async () => {
+      vi.stubEnv('CI', 'true');
+      await slogx.init({ isDev: true, stream: true });
+      expect(WebSocketServer).toHaveBeenCalled();
+      expect(CIWriterMock).toHaveBeenCalled();
+    });
+
+    it('disables WebSocket with stream: false', async () => {
+      await slogx.init({ isDev: true, stream: false });
+      expect(WebSocketServer).not.toHaveBeenCalled();
+      expect(CIWriterMock).not.toHaveBeenCalled();
+    });
+
+    it('writes to file and broadcasts the same entry', async () => {
+      await slogx.init({ isDev: true, ciMode: true, stream: true });
+
+      const mockClient = { readyState: 1, send: vi.fn(), on: vi.fn() };
+      const connectionHandler = mockWss.on.mock.calls.find(
+        (call: any[]) => call[0] === 'connection'
+      )?.[1];
+      connectionHandler(mockClient);
+
+      slogx.info('both');
+
+      const writer = CIWriterMock.mock.results[0].value;
+      expect(writer.write).toHaveBeenCalledTimes(1);
+      expect(mockClient.send).toHaveBeenCalledTimes(1);
+      const written = writer.write.mock.calls[0][0];
+      const sent = JSON.parse(mockClient.send.mock.calls[0][0]);
+      expect(sent.id).toBe(written.id);
+      expect(sent.args[0]).toBe('both');
+    });
+  });
 });

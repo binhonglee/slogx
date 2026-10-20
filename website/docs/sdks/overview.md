@@ -9,6 +9,7 @@ All SDKs expose the same logging levels and comparable runtime controls:
 
 - live WebSocket mode for local development
 - CI NDJSON mode for replay
+- both at once (file output plus live streaming)
 - call-site metadata (`file`, `line`, `func`, `service`)
 - stacktrace capture (with special handling for exceptions/errors)
 
@@ -19,7 +20,8 @@ All SDKs expose the same logging levels and comparable runtime controls:
 | `isDev` / `is_dev` / `IsDev` | bool | required | Safety gate for non-production usage |
 | `port` / `Port` | number | `8080` | WebSocket port in live mode |
 | `serviceName` / `service_name` / `ServiceName` | string | language-specific | Service label in metadata |
-| `ciMode` / `ci_mode` / `CIMode` | bool? | auto-detect | Force mode or rely on CI detection |
+| `ciMode` / `ci_mode` / `CIMode` | bool? | auto-detect | Enable/disable NDJSON file output, or rely on CI detection |
+| `stream` / `Stream` | bool? | `!ciMode` | Enable/disable the WebSocket server; set `true` with `ciMode` to do both |
 | `logFilePath` / `log_file_path` / `LogFilePath` | string | `./slogx_logs/<service>.ndjson` | NDJSON output path |
 | `maxEntries` / `max_entries` / `MaxEntries` | number | `10000` | Rolling entry limit in CI mode |
 

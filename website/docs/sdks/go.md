@@ -21,6 +21,7 @@ type Config struct {
     CIMode      *bool
     LogFilePath string
     MaxEntries  int
+    Stream      *bool
 }
 
 func Init(config Config)
