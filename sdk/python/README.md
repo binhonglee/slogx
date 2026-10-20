@@ -48,6 +48,8 @@ slogx.init(
 slogx.info("CI log entry", {"ok": True})
 ```
 
+Pass `stream=True` alongside `ci_mode=True` to write the file and stream over WebSocket at the same time.
+
 ## Features
 
 - WebSocket-based real-time log streaming

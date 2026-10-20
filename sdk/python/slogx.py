@@ -148,7 +148,8 @@ class SlogX:
         service_name: str = 'python-service',
         ci_mode: Optional[bool] = None,
         log_file_path: Optional[str] = None,
-        max_entries: int = 10000
+        max_entries: int = 10000,
+        stream: Optional[bool] = None
     ):
         """Initialize the SlogX server. Starts a WebSocket server on the specified port.
 
@@ -156,9 +157,11 @@ class SlogX:
             is_dev: Required. Must be True to enable slogx. Prevents accidental production use.
             port: WebSocket server port (default 8080)
             service_name: Service name for log metadata
-            ci_mode: Optional. None = auto-detect, True = force CI mode, False = force WebSocket mode
+            ci_mode: Optional. None = auto-detect, True = force file output, False = disable file output
             log_file_path: Optional. Log file path for CI mode
             max_entries: Optional. Max log entries to keep for CI mode
+            stream: Optional. None = stream over WebSocket only when file output is disabled,
+                True = always stream (combine with ci_mode=True to do both), False = never stream
 
         Blocks until the server is ready to accept connections.
         """
@@ -167,12 +170,15 @@ class SlogX:
 
         self._service_name = service_name
         use_ci = ci_mode if ci_mode is not None else _detect_ci()
+        use_stream = stream if stream is not None else not use_ci
 
         if use_ci:
             file_path = log_file_path or f"./slogx_logs/{self._service_name}.ndjson"
             self._ci_writer = CIWriter(file_path, max_entries)
             self._initialized = True
             print(f"[slogx] 📝 CI mode: logging to {file_path}")
+
+        if not use_stream:
             return
 
         self._loop = asyncio.new_event_loop()
@@ -225,41 +231,8 @@ class SlogX:
 
     def _log(self, level: LogLevel, *args: Any):
         """Core logging function."""
-        if self._ci_writer:
-            caller = self._get_caller_info()
-            processed_args = []
-            final_stack = caller.get('clean_stack')
-
-            for arg in args:
-                if isinstance(arg, Exception):
-                    final_stack = ''.join(traceback.format_exception(type(arg), arg, arg.__traceback__))
-                    processed_args.append({
-                        'name': type(arg).__name__,
-                        'message': str(arg),
-                        'stack': final_stack
-                    })
-                else:
-                    processed_args.append(arg)
-
-            entry = {
-                'id': self._generate_id(),
-                'timestamp': datetime.utcnow().isoformat() + 'Z',
-                'level': level.value,
-                'args': processed_args,
-                'stacktrace': final_stack,
-                'metadata': {
-                    'file': caller.get('file'),
-                    'line': caller.get('line'),
-                    'func': caller.get('func'),
-                    'lang': 'python',
-                    'service': self._service_name
-                }
-            }
-
-            self._ci_writer.write(entry)
-            return
-
-        if not self._loop or not self._clients:
+        has_clients = bool(self._loop and self._clients)
+        if not self._ci_writer and not has_clients:
             return
 
         caller = self._get_caller_info()
@@ -291,6 +264,12 @@ class SlogX:
                 'service': self._service_name
             }
         }
+
+        if self._ci_writer:
+            self._ci_writer.write(entry)
+
+        if not has_clients:
+            return
 
         payload = json.dumps(entry, default=str)
 

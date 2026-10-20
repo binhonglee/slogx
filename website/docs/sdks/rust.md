@@ -22,6 +22,7 @@ pub async fn init_with_config(
     ci_mode: Option<bool>,
     log_file: Option<String>,
     max_entries: Option<usize>,
+    stream: Option<bool>,
 )
 
 slogx::debug!(...)

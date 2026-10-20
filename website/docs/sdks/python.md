@@ -21,6 +21,7 @@ slogx.init(
     ci_mode: Optional[bool] = None,
     log_file_path: Optional[str] = None,
     max_entries: int = 10000,
+    stream: Optional[bool] = None,
 ) -> None
 
 slogx.close() -> None

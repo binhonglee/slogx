@@ -47,17 +47,24 @@ const detectCI = (): boolean => {
 interface SlogConfig {
   /** Required safety flag - set to true to acknowledge this is not for production use */
   isDev: boolean;
-  /** Port for WebSocket server (default 8080). Ignored in CI mode. */
+  /** Port for WebSocket server (default 8080). Ignored when streaming is disabled. */
   port?: number;
   /** Service name for log metadata (default 'node-service') */
   serviceName?: string;
   /** 
-   * CI mode: write logs to file instead of WebSocket.
+   * CI mode: write logs to an NDJSON file.
    * undefined = auto-detect based on CI env vars
-   * true = force file mode
-   * false = force WebSocket mode even in CI
+   * true = force file output
+   * false = disable file output even in CI
    */
   ciMode?: boolean;
+  /**
+   * Stream logs live over WebSocket.
+   * undefined = enabled only when file output is disabled (one or the other)
+   * true = always start the WebSocket server (combine with ciMode: true to do both)
+   * false = never start the WebSocket server
+   */
+  stream?: boolean;
   /** Log file path (default './slogx_logs/<serviceName>.ndjson') */
   logFilePath?: string;
   /** Maximum log entries to keep in file (default 10000, rolling window) */
@@ -90,6 +97,7 @@ class SlogX {
    * 
    * In normal mode: starts a WebSocket server on the specified port.
    * In CI mode: writes logs to a file instead.
+   * Set config.stream to true alongside CI mode to do both.
    * 
    * CI mode is auto-detected by default based on common CI env vars,
    * or can be explicitly set via config.ciMode.
@@ -104,20 +112,23 @@ class SlogX {
 
     this.serviceName = config.serviceName || 'node-service';
 
-    // Determine if we should use CI mode
+    // Determine which outputs to enable
     const useCIMode = config.ciMode ?? detectCI();
+    const useStream = config.stream ?? !useCIMode;
 
     if (useCIMode) {
-      return this.initCIMode(config);
-    } else {
+      this.initCIMode(config);
+    }
+    if (useStream) {
       return this.initWebSocketMode(config);
     }
+    return Promise.resolve();
   }
 
   /**
    * Initialize CI mode: write logs to file.
    */
-  private initCIMode(config: SlogConfig): Promise<void> {
+  private initCIMode(config: SlogConfig): void {
     const filePath = config.logFilePath || `./slogx_logs/${this.serviceName}.ndjson`;
     const maxEntries = config.maxEntries || 10000;
 
@@ -125,7 +136,6 @@ class SlogX {
     this.initialized = true;
 
     console.log(`[slogx] 📝 CI mode: logging to ${filePath}`);
-    return Promise.resolve();
   }
 
   /**
@@ -215,10 +225,11 @@ class SlogX {
       }
     };
 
-    // Send to appropriate destination
+    // Send to every enabled destination
     if (this.ciWriter) {
       this.ciWriter.write(entry);
-    } else if (this.wss) {
+    }
+    if (this.wss) {
       const payload = JSON.stringify(entry);
       this.clients.forEach(client => {
         if (client.readyState === WebSocket.OPEN) {

@@ -140,6 +140,16 @@ slogx.init({
 **Or let it auto-detect** — the SDK checks for these environment variables:
 - `CI`, `GITHUB_ACTIONS`, `GITLAB_CI`, `JENKINS_HOME`, `CIRCLECI`, `BUILDKITE`, `TF_BUILD`, `TRAVIS`
 
+**Log to file and stream live at the same time:** set `stream: true` alongside CI mode to keep the WebSocket server running while also writing NDJSON.
+```js
+slogx.init({
+  isDev: true,
+  serviceName: 'api',
+  ciMode: true,  // write ./slogx_logs/api.ndjson
+  stream: true,  // and stream to the live viewer
+});
+```
+
 **View replay logs:**
 1. Open the replay UI ([https://binhonglee.github.io/slogx/replay](https://binhonglee.github.io/slogx/replay))
 2. Drop in an `.ndjson` file, paste a URL, or click **Try Demo CI Logs**

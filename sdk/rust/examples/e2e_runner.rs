@@ -37,7 +37,7 @@ async fn main() {
     let ci_mode = mode == "ci";
     let log_file = if file_path.is_empty() { None } else { Some(file_path) };
 
-    slogx::init_with_config(true, port, &service, Some(ci_mode), log_file, Some(1000)).await;
+    slogx::init_with_config(true, port, &service, Some(ci_mode), log_file, Some(1000), None).await;
 
     let prefix = format!("SDK RUST {}", mode.to_uppercase());
 
