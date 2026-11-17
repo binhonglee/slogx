@@ -34,7 +34,7 @@
     "@types/ws": "8.18.2",
     "@vitest/coverage-v8": "5.1.0",
     "docusaurus-smg": "0.0.4",
-    "jsdom": "31.0.0",
+    "jsdom": "31.0.1",
     "typescript": "7.0.2",
     "vite": "8.3.8",
     "vitest": "5.1.0"
